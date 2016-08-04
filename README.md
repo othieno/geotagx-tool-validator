@@ -1,6 +1,7 @@
 # GeoTag-X Project Validator
 
-[![Build Status](https://travis-ci.org/geotagx/geotagx-tool-validator.svg?branch=master)](https://travis-ci.org/geotagx/geotagx-tool-validator)
+[![Coverage Status](https://coveralls.io/repos/github/othieno/geotagx-tool-validator/badge.svg?branch=master)](https://coveralls.io/github/othieno/geotagx-tool-validator?branch=master)
+[![Build Status](https://travis-ci.org/othieno/geotagx-tool-validator.svg?branch=master)](https://travis-ci.org/othieno/geotagx-tool-validator)
 
 The project validator is a command line tool used to validate GeoTag-X project configurations as per their technical specifications which may be found [here][project_specification] (project), [here][task_presenter_specification] (task presenter) and [here][tutorial_specification] (tutorial).
 
