@@ -43,7 +43,3 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertFalse(helper.is_empty_string("trailblazer   "), "String with trailing whitespace.")
         self.assertFalse(helper.is_empty_string("    Hello, World    "), "String with leading and trailing whitespace.")
         self.assertFalse(helper.is_empty_string("\r\n\t\\"), "Escape sequences with backslash character.")
-
-
-if __name__ == "__main__":
-    unittest.main()
