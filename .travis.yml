@@ -1,0 +1,16 @@
+language: python
+python:
+    - "2.6"
+    - "2.7"
+install:
+    - pip install pip -U
+    - pip install coverage
+    - pip install python-coveralls
+    - python setup.py -q install
+script:
+    - nosetests --with-coverage -v
+branches:
+    only:
+        - master
+after_success:
+    - coveralls
