@@ -11,12 +11,12 @@ The project validator is a command line tool used to validate GeoTag-X project c
 
 With the tool installed (please refer to the [installation guide](INSTALL.md)), you may display its help and usage manual by running
 ```bash
-geotagx-validator --help
+$ geotagx-validator --help
 ```
 
 Validating a project located at `/path/to/geotagx/project/` is as simple as running
 ```bash
-geotagx-validator /path/to/geotagx/project/
+$ geotagx-validator /path/to/geotagx/project/
 ```
 
 
