@@ -2,7 +2,8 @@
 
 [![Build Status](https://travis-ci.org/geotagx/geotagx-tool-validator.svg?branch=master)](https://travis-ci.org/geotagx/geotagx-tool-validator)
 
-The project validator is a command line tool used to validate GeoTag-X project configurations as per the [technical specification](https://github.com/geotagx/geotagx-documentation/specification.CONFIGURATIONS.md).
+The project validator is a command line tool used to validate GeoTag-X project configurations as per their technical specifications which may be found [here][project_specification] (project), [here][task_presenter_specification] (task presenter) and [here][tutorial_specification] (tutorial).
+
 
 
 ## Validating a Project
@@ -14,10 +15,17 @@ geotagx-validator --help
 
 Validating a project located at `/path/to/geotagx/project/` is as simple as running
 ```bash
-geotagx-validator /path/to/geotagx/project
+geotagx-validator /path/to/geotagx/project/
 ```
+
 
 
 ## Getting Involved
 
 Have you noticed a bug in our code? Do you think we can improve this project? Learn how to [contribute to this project](CONTRIBUTING.md)!
+
+
+
+[project_specification]: https://github.com/geotagx/geotagx-documentation/specifications/project-configuration.md "Project Configuration Specification"
+[task_presenter_specification]: https://github.com/geotagx/geotagx-documentation/specifications/task-presenter-configuration.md "Task Presenter Configuration Specification"
+[tutorial_specification]: https://github.com/geotagx/geotagx-documentation/specifications/tutorial-configuration.md "Tutorial Configuration Specification"
