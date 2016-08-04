@@ -34,10 +34,10 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertTrue(helper.is_empty_string("\r\n\t"), "Empty string (escape sequences).")
 
     def test_nonempty_strings(self):
-        self.assertRaises(TypeError, helper.is_empty_string, None, "Argument is not a string (NoneType object).")
-        self.assertRaises(TypeError, helper.is_empty_string, {}, "Argument is not a string (dictionary).")
-        self.assertRaises(TypeError, helper.is_empty_string, 42, "Argument is not a string (number).")
-        self.assertRaises(TypeError, helper.is_empty_string, [], "Argument is not a string (list).")
+        self.assertRaises(TypeError, helper.is_empty_string, None)
+        self.assertRaises(TypeError, helper.is_empty_string, {})
+        self.assertRaises(TypeError, helper.is_empty_string, 42)
+        self.assertRaises(TypeError, helper.is_empty_string, [])
         self.assertFalse(helper.is_empty_string("Hello, World"), "Non-empty string.")
         self.assertFalse(helper.is_empty_string("   *"), "String with leading whitespace and asterisk.")
         self.assertFalse(helper.is_empty_string("trailblazer   "), "String with trailing whitespace.")
