@@ -49,7 +49,7 @@ setup(
     package_dir={"geotagx_validator": "src"},
     entry_points={
         "console_scripts":[
-            "geotagx-validator=geotagx_validator.validator:main"
+            "geotagx-validator=geotagx_validator.__main__:main"
         ]
     }
 )

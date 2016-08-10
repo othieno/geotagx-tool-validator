@@ -24,6 +24,37 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
+def main():
+    """Executes the application.
+    """
+    import sys
+    sys.exit(run(get_argparser().parse_args(sys.argv[1:])))
+
+
+def run(arguments):
+    """Executes the application with the specified command-line arguments.
+
+    Args:
+        arguments (list): A list of command-line argument strings.
+    """
+    raise NotImplementedError()
+
+
+def get_argparser():
+    """Constructs the application's command-line argument parser.
+
+    Returns:
+        argparse.ArgumentParser: A command-line argument parser instance.
+    """
+    raise NotImplementedError()
+
+
+def _version():
+    """Returns the tool's version string.
+    """
+    from __init__ import __version__
+    return "GeoTag-X Project Validator v%s, Copyright (C) 2016 UNITAR/UNOSAT." % __version__
+
+
 if __name__ == "__main__":
-    import sys, validator
-    sys.exit(validator.main())
+    main()
