@@ -27,11 +27,7 @@
 # OR OTHER DEALINGS IN THE SOFTWARE.
 from helper import is_empty_string
 
-def is_question(question): # pragma: no cover
-    raise NotImplementedError()
-
-
-def is_key(question_key):
+def is_key(key):
     """Validates the specified question key.
 
     A key is a non-empty string that is strictly composed of alphanumeric
@@ -39,7 +35,7 @@ def is_key(question_key):
     not begin with an underscore as those are keys reserved for internal use.
 
     Args:
-        question_key (str): A question key to validate.
+        key (str): A question key to validate.
 
     Returns:
         <bool, str|None>: A pair containing the value True if the specified question key
@@ -47,15 +43,43 @@ def is_key(question_key):
     """
     try:
         ERROR_MESSAGE = "A question key must be a non-empty string strictly composed of alphanumeric characters (a-z, A-Z, 0-9), hyphens (-) or underscores (_). It must never begin with an underscore."
-        if is_empty_string(question_key):
+        if is_empty_string(key):
             return (False, ERROR_MESSAGE)
         else:
             from re import match
-            matches = match("(?!_)[a-zA-Z0-9-_]+", question_key)
-            valid = matches and matches.group() == question_key
+            matches = match("(?!_)[a-zA-Z0-9-_]+", key)
+            valid = matches and matches.group() == key
             return (True, None) if valid else (False, ERROR_MESSAGE)
     except TypeError:
-        return (False, "The 'question_key' argument must be a non-empty string.")
+        return (False, "The key argument must be a non-empty string.")
+
+
+def is_reserved_key(key):
+    """Validates the specified reserved question key.
+
+    A key is a non-empty string that is strictly composed of alphanumeric
+    characters (a-Z, A-Z, 0-9), hyphens (-) or underscores (_). A reserved key
+    is almost identical to a regular question key with one slight difference: it
+    must always begin with an underscore.
+
+    Args:
+        key (str): A reserved key to validate.
+
+    Returns:
+        bool: True if the specified key is valid and reserved for internal use,
+        False otherwise.
+    """
+    try:
+        ERROR_MESSAGE = "A reserved key must be a non-empty string strictly composed of alphanumeric characters (a-z, A-Z, 0-9), hyphens (-) or underscores (_). It must always begin with an underscore."
+        if is_empty_string(key):
+            return (False, ERROR_MESSAGE)
+        else:
+            from re import match
+            matches = match("_+[a-zA-Z0-9-_]+", key)
+            valid = matches and matches.group() == key
+            return (True, None) if valid else (False, ERROR_MESSAGE)
+    except TypeError:
+        return (False, "The key argument must be a non-empty string.")
 
 
 def is_title(question_title): # pragma: no cover
@@ -72,3 +96,20 @@ def is_input(question_input): # pragma: no cover
 
 def is_branch(question_branch): # pragma: no cover
     raise NotImplementedError()
+
+
+def is_question(question): # pragma: no cover
+    raise NotImplementedError()
+
+
+is_question.FIELD_VALIDATORS = {
+    "key": is_key,
+    "title": is_title,
+    "hint": is_help,
+    "help": is_help,
+    "input": is_input,
+    "branch": is_branch,
+}
+
+
+is_question.OPTIONAL_FIELDS = frozenset(["branch", "help", "hint"])

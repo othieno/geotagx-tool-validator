@@ -47,7 +47,25 @@ class TestQuestionValidators(unittest.TestCase):
         self.assertFalse(validator.is_key("*$/\\")[0], "Unaccepted characters")
         self.assertFalse(validator.is_key("\n")[0], "Illegal escape character")
         self.assertFalse(validator.is_key("_end")[0], "Leading underscore (reserved key)")
-        self.assertFalse(validator.is_key("__--")[0], "Multiple leading underscores")
+        self.assertFalse(validator.is_key("__--")[0], "Multiple leading underscores (reserved key)")
         self.assertFalse(validator.is_key(42)[0], "Not a string (number)")
         self.assertFalse(validator.is_key([])[0], "Not a string (list)")
         self.assertFalse(validator.is_key({})[0], "Not a string (dictionary)")
+
+    def test_valid_reserved_keys(self):
+        self.assertTrue(validator.is_reserved_key("__")[0], "Underscores only")
+        self.assertTrue(validator.is_reserved_key("__--")[0], "Underscores and hyphens only")
+        self.assertTrue(validator.is_reserved_key("__key")[0], "Leading underscores")
+        self.assertTrue(validator.is_reserved_key("_now-y0u_4re-pushing-1t")[0], "Mixed characters")
+
+    def test_illegal_reserved_keys(self):
+        self.assertFalse(validator.is_reserved_key(None)[0], "No value")
+        self.assertFalse(validator.is_reserved_key("")[0], "Empty string")
+        self.assertFalse(validator.is_reserved_key("   ")[0], "Whitespace only")
+        self.assertFalse(validator.is_reserved_key("  key")[0], "Leading whitespace")
+        self.assertFalse(validator.is_reserved_key("__  key")[0], "Whitespace in between characters")
+        self.assertFalse(validator.is_reserved_key("end")[0], "No leading underscore")
+        self.assertFalse(validator.is_reserved_key("_end\t")[0], "Traling tabulation")
+        self.assertFalse(validator.is_reserved_key("*$/\\")[0], "Unaccepted characters")
+        self.assertFalse(validator.is_reserved_key(42)[0], "Not a string")
+        self.assertFalse(validator.is_reserved_key("\n")[0], "Illegal escape character")
