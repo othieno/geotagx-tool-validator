@@ -38,9 +38,36 @@ def is_empty_string(empty_string):
         bool: True if the specified string is empty, False otherwise.
 
     Raises:
-        TypeError: If the "empty_string" parameter is not a string.
+        TypeError: If the empty_string argument is not a string.
     """
     if not isinstance(empty_string, basestring):
-        raise TypeError("Invalid parameter type: is_empty_string expects 'basestring' but got '{}'.".format(type(empty_string).__name__))
+        raise TypeError("Invalid argument type: is_empty_string expects 'basestring' but got '{}'.".format(type(empty_string).__name__))
 
     return not empty_string or empty_string.isspace()
+
+
+def is_iso_3166_1_alpha_2_code(code):
+    """Validates the specified ISO 3166-1 alpha-2 code.
+
+    An ISO 3166-1 alpha-2 code is a two-letter uppercase string assigned to a region,
+    e.g. GB (United Kingdom), US (United States) or CH (Switzerland).
+
+    Args:
+        code (str): An ISO 3166-1 alpha-2 code to validate.
+
+    Returns:
+        bool: True if the specified code is a valid ISO 3166-1 alpha-2 code, False otherwise.
+
+    Raises:
+        TypeError: If the code argument is not a string.
+    """
+    try:
+        if is_empty_string(code):
+            return False
+        else:
+            # TODO Optimize this: Regular expressions are a bit of an overkill.
+            from re import match
+            matches = match("[A-Z]{2}", code)
+            return matches and matches.group() == code
+    except TypeError:
+        return False

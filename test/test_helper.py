@@ -43,3 +43,20 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertFalse(helper.is_empty_string("trailblazer   "), "String with trailing whitespace.")
         self.assertFalse(helper.is_empty_string("    Hello, World    "), "String with leading and trailing whitespace.")
         self.assertFalse(helper.is_empty_string("\r\n\t\\"), "Escape sequences with backslash character.")
+
+    def test_valid_iso_3166_1_alpha_2_codes(self):
+        self.assertTrue(helper.is_iso_3166_1_alpha_2_code("CH"), "Switzerland")
+        self.assertTrue(helper.is_iso_3166_1_alpha_2_code("GB"), "United Kingdom")
+        self.assertTrue(helper.is_iso_3166_1_alpha_2_code("US"), "United States")
+        self.assertTrue(helper.is_iso_3166_1_alpha_2_code("UG"), "Uganda")
+
+    def test_illegal_iso_3166_1_alpha_2_codes(self):
+        self.assertFalse(helper.is_iso_3166_1_alpha_2_code(None), "No code")
+        self.assertFalse(helper.is_iso_3166_1_alpha_2_code(""), "Empty string")
+        self.assertFalse(helper.is_iso_3166_1_alpha_2_code({}), "Non-string value (dictionary)")
+        self.assertFalse(helper.is_iso_3166_1_alpha_2_code(42), "Non-string value (number)")
+        self.assertFalse(helper.is_iso_3166_1_alpha_2_code("42"), "String containing non-alphabet characters")
+        self.assertFalse(helper.is_iso_3166_1_alpha_2_code("A4"), "Two-character string containing a numeric character")
+        self.assertFalse(helper.is_iso_3166_1_alpha_2_code("ch"), "Lowercase ISO code")
+        self.assertFalse(helper.is_iso_3166_1_alpha_2_code("   CH"), "Valid ISO code with leading whitespace.")
+        self.assertFalse(helper.is_iso_3166_1_alpha_2_code("CH   "), "Valid ISO code with trailing whitespace.")
