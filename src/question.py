@@ -82,34 +82,67 @@ def is_reserved_key(key):
         return (False, "The key argument must be a non-empty string.")
 
 
-def is_title(question_title): # pragma: no cover
+def is_title(question_title, available_languages=None): # pragma: no cover
     raise NotImplementedError()
 
 
-def is_help(question_help): # pragma: no cover
+def is_help(question_help, available_languages=None): # pragma: no cover
     raise NotImplementedError()
 
 
-def is_input(question_input): # pragma: no cover
+def is_input(question_input, available_languages=None): # pragma: no cover
     raise NotImplementedError()
 
 
-def is_branch(question_branch): # pragma: no cover
+def is_control_flow(question_branch): # pragma: no cover
     raise NotImplementedError()
 
 
-def is_question(question): # pragma: no cover
-    raise NotImplementedError()
+def is_question(question, available_languages=None):
+    """Validates the specified question configuration.
+
+    A valid question configuration is comprised of the following fields:
+    - key: the question's unique identifier,
+    - title: the question's title,
+    - hint (optional): a short hint that may help clarify the question,
+    - help (optional): a longer, more elaborate explanation of the question,
+    - input: a configuration for the question's input,
+    - branch (optional): a configuration that determines the next question depending on
+      the answer to the this question.
+
+    Args:
+        question (dict): A question configuration to validate.
+        available_languages (list): A list of available languages.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the specified configuration
+            is valid, False otherwise; as well as an error message in case it is invalid.
+    """
+    if not isinstance(question, dict) or not question:
+        return (False, "The question argument must be a non-empty dictionary.")
+
+    from functools import partial
+    VALIDATORS = {
+        "key": is_key,
+        "title": partial(is_title, available_languages=available_languages),
+        "hint": partial(is_help, available_languages=available_languages),
+        "help": partial(is_help, available_languages=available_languages),
+        "input": partial(is_input, available_languages=available_languages),
+        "branch": is_control_flow,
+    }
+
+    for key in VALIDATORS.keys():
+        field = question.get(key)
+        if field is None and key in is_question.REQUIRED_FIELD_KEYS:
+            return (False, "The question configuration must contain the '{}' field.".format(key))
+        elif field:
+            validator = VALIDATORS[key]
+            valid, message = validator(field)
+            if not valid:
+                return (False, message)
+
+    return (True, None)
 
 
-is_question.FIELD_VALIDATORS = {
-    "key": is_key,
-    "title": is_title,
-    "hint": is_help,
-    "help": is_help,
-    "input": is_input,
-    "branch": is_branch,
-}
-
-
-is_question.OPTIONAL_FIELDS = frozenset(["branch", "help", "hint"])
+is_question.REQUIRED_FIELD_KEYS = frozenset(["key", "title", "input"])
+"""A set of required question fields."""

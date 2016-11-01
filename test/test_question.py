@@ -69,3 +69,12 @@ class TestQuestionValidators(unittest.TestCase):
         self.assertFalse(validator.is_reserved_key("*$/\\")[0], "Unaccepted characters")
         self.assertFalse(validator.is_reserved_key(42)[0], "Not a string")
         self.assertFalse(validator.is_reserved_key("\n")[0], "Illegal escape character")
+
+    def test_valid_questions(self):
+        pass
+
+    def test_illegal_questions(self):
+        self.assertFalse(validator.is_question(None)[0], "No value")
+        self.assertFalse(validator.is_question({})[0], "Empty dict")
+        self.assertFalse(validator.is_question("")[0], "Not a dict (empty string)")
+        self.assertFalse(validator.is_question(42)[0], "Not a dict (numerical value)")
