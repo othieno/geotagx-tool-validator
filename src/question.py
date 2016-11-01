@@ -31,7 +31,7 @@ def is_question(question): # pragma: no cover
     raise NotImplementedError()
 
 
-def is_question_key(question_key):
+def is_key(question_key):
     """Validates the specified question key.
 
     A key is a non-empty string that is strictly composed of alphanumeric
@@ -58,17 +58,17 @@ def is_question_key(question_key):
         return (False, "The 'question_key' argument must be a non-empty string.")
 
 
-def is_question_title(question_title): # pragma: no cover
+def is_title(question_title): # pragma: no cover
     raise NotImplementedError()
 
 
-def is_question_help(question_help): # pragma: no cover
+def is_help(question_help): # pragma: no cover
     raise NotImplementedError()
 
 
-def is_question_input(question_input): # pragma: no cover
+def is_input(question_input): # pragma: no cover
     raise NotImplementedError()
 
 
-def is_question_branch(question_branch): # pragma: no cover
+def is_branch(question_branch): # pragma: no cover
     raise NotImplementedError()
