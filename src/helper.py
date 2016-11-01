@@ -97,3 +97,50 @@ def is_iso_15924_code(code):
         # string. So if the argument is not a string, it stands to reason that it's not a
         # valid ISO code.
         return False
+
+
+def is_language_code(code):
+    """Validates the specified language code.
+
+    A language code is a non-empty string containing two or three lowercase letters. It may
+    be extended with one of the following variety codes:
+    - an ISO 3166-1 alpha-2 code to denote the region in which the language is spoken,
+    - an ISO 15924 code which represents the name of the language's writing system (script).
+
+    A variety code must always be preceded by a hyphen (-) e.g. en-GB, zh-Hans, az-Latn or fr-CH.
+
+    Args:
+        code (str): A language code to validate.
+
+    Returns:
+        bool: True if the specified code is a valid language code, False otherwise.
+    """
+    try:
+        if is_empty_string(code):
+            return False
+        elif code in is_language_code.KNOWN_LANGUAGE_CODES:
+            return True
+        else:
+            from re import match
+            matches = match(r"([a-z]{2,3})(-[a-zA-Z]{2,4})?", code)
+            if matches and matches.group() == code:
+                valid = True
+                variety = matches.group(2)
+                if variety:
+                    variety = variety[1:] # Skip the hyphen separator.
+                    valid = is_iso_3166_1_alpha_2_code(variety) or is_iso_15924_code(variety)
+
+                if valid:
+                    is_language_code.KNOWN_LANGUAGE_CODES.add(code)
+
+                return valid
+            else:
+                return False
+    except TypeError:
+        # The is_empty_string function will raise a TypeError if the code argument is not a
+        # string. So if the argument is not a string, it stands to reason that it's not a
+        # valid ISO code.
+        return False
+
+is_language_code.KNOWN_LANGUAGE_CODES = set()
+"""A cache used by the is_language_code function to store and quickly retrieve verified languages codes."""
