@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This module is part of the GeoTag-X project sanitizer tool.
-# It contains unit tests for question module.
+# It contains unit tests for the question module.
 #
 # Author: Jeremy Othieno (j.othieno@gmail.com)
 #

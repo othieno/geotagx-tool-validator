@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# This module is part of the GeoTag-X project sanitizer tool.
-# It contains validators for various components of a question sub-configuration.
+# This module is part of the GeoTag-X project validator tool.
+# It contains validators for various components of a question configuration.
 #
 # Author: Jeremy Othieno (j.othieno@gmail.com)
 #
