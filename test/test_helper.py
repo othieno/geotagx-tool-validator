@@ -60,3 +60,21 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertFalse(helper.is_iso_3166_1_alpha_2_code("ch"), "Lowercase ISO code")
         self.assertFalse(helper.is_iso_3166_1_alpha_2_code("   CH"), "Valid ISO code with leading whitespace.")
         self.assertFalse(helper.is_iso_3166_1_alpha_2_code("CH   "), "Valid ISO code with trailing whitespace.")
+
+    def test_valid_iso_15924_codes(self):
+        self.assertTrue(helper.is_iso_15924_code("Latn"), "Latin")
+        self.assertTrue(helper.is_iso_15924_code("Cyrl"), "Cyrillic")
+        self.assertTrue(helper.is_iso_15924_code("Hans"), "Han (Simplified)")
+        self.assertTrue(helper.is_iso_15924_code("Zzzz"), "Uncoded script")
+
+    def test_illegal_iso_15924_codes(self):
+        self.assertFalse(helper.is_iso_15924_code(None), "No code")
+        self.assertFalse(helper.is_iso_15924_code(""), "Empty string")
+        self.assertFalse(helper.is_iso_15924_code({}), "Non-string value (dictionary)")
+        self.assertFalse(helper.is_iso_15924_code(42), "Non-string value (number)")
+        self.assertFalse(helper.is_iso_15924_code("42"), "String containing non-alphabet characters")
+        self.assertFalse(helper.is_iso_15924_code("A444"), "Four-character string containing numeric characters")
+        self.assertFalse(helper.is_iso_15924_code("latn"), "Non-capitalized code")
+        self.assertFalse(helper.is_iso_15924_code("Latin"), "Five-letter code")
+        self.assertFalse(helper.is_iso_15924_code("    Latn"), "Valid ISO code with leading whitespace")
+        self.assertFalse(helper.is_iso_15924_code("Latn    "), "Valid ISO code with trailing whitespace")

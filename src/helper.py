@@ -71,3 +71,29 @@ def is_iso_3166_1_alpha_2_code(code):
             return matches and matches.group() == code
     except TypeError:
         return False
+
+
+def is_iso_15924_code(code):
+    """Validates the specified ISO 15924 code.
+
+    An ISO 15924 code is a four-letter capitalized string assigned to a language's writing system,
+    for instance Latn (Latin), Cyrl (Cyrillic), or Arab (Arabic).
+
+    Args:
+        code (str): An ISO 15924 code to validate.
+
+    Returns:
+        bool: True if the specified code is a valid ISO 15924 code, False otherwise.
+
+    Raises:
+        TypeError: If the code argument is not a string.
+    """
+    try:
+        if is_empty_string(code):
+            return False
+        else:
+            from re import match
+            matches = match("[A-Z]{1}[a-z]{3}", code)
+            return matches and matches.group() == code
+    except TypeError:
+        return False
