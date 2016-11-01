@@ -110,3 +110,26 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertFalse(helper.is_language_code("-en-GB"), "Leading hyphen")
         self.assertFalse(helper.is_language_code("az-Latin"), "Invalid script name (longer than 4 letters)")
         self.assertFalse(helper.is_language_code("az-latn"), "Invalid script name (not capitalized)")
+
+    def test_valid_normalized_strings(self):
+        self.assertTrue(helper.is_normalized_string({"en":"What is the answer to life?"}), "Normalized string")
+        self.assertTrue(helper.is_normalized_string({"en":"???"}), "Normalized string (syntactically)")
+        self.assertTrue(helper.is_normalized_string({"fr-CH":"Mais où est donc Ornicar?"}), "Normalized swiss-french string")
+        self.assertTrue(helper.is_normalized_string({"en":"What is the answer to life?", "fr":"Mais où est donc Ornicar?"}), "Normalized string with multiple languages")
+        self.assertTrue(helper.is_normalized_string({"en":"???", "fr":"???"}, ["en"]), "Normalized string with required language")
+        self.assertTrue(helper.is_normalized_string({"en":"???", "fr":"???"}, ["en", "fr"]), "Normalized string with multiple required languages")
+
+    def test_illegal_normalized_strings(self):
+        self.assertRaises(TypeError, helper.is_normalized_string, None)
+        self.assertRaises(TypeError, helper.is_normalized_string, "")
+        self.assertRaises(TypeError, helper.is_normalized_string, 42)
+        self.assertRaises(TypeError, helper.is_normalized_string, [])
+        self.assertRaises(TypeError, helper.is_normalized_string, {"en":"???", "fr":"???"}, ("en", "fr"))
+        self.assertFalse(helper.is_normalized_string({}), "Empty dictionary")
+        self.assertFalse(helper.is_normalized_string({"en":""}), "Empty string with a valid language code")
+        self.assertFalse(helper.is_normalized_string({"en":None}), "Valid language code with non-string (None) value")
+        self.assertFalse(helper.is_normalized_string({"en":32}), "Valid language code with non-string (int) value")
+        self.assertFalse(helper.is_normalized_string({"en":{}}), "Valid language code with non-string (dict) value")
+        self.assertFalse(helper.is_normalized_string({"en 12":"What is your name?"}), "Invalid language code")
+        self.assertFalse(helper.is_normalized_string({"en":"What is your name?", "fr":""}), "Missing question")
+        self.assertFalse(helper.is_normalized_string({"en":"What is your name?"}, ["fr"]), "Missing a required language")

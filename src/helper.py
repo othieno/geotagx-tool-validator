@@ -143,4 +143,39 @@ def is_language_code(code):
         return False
 
 is_language_code.KNOWN_LANGUAGE_CODES = set()
-"""A cache used by the is_language_code function to store and quickly retrieve verified languages codes."""
+"""A cache used by the is_language_code function to store and quickly retrieve verified language codes."""
+
+
+def is_normalized_string(normalized_string, language_codes=None):
+    """Checks if the specified string is normalized.
+
+    A normalized string is not a true string but rather a non-empty dictionary where each key is a
+    language code that is mapped to a non-empty string.
+
+    Args:
+        normalized_string (dict): A normalized string to validate.
+        language_codes (list): A list of language codes that the normalized string dictionary must contain.
+            If unspecified, the function only verifies that the dictionary keys are indeed valid language codes.
+
+    Returns:
+        bool: True if the specified string is normalized, False otherwise.
+
+    Raises:
+        TypeError: If the normalized_string argument is not a dictionary or if the language_codes argument is
+            not a list or a NoneType.
+    """
+    if not isinstance(normalized_string, dict):
+        raise TypeError("Invalid argument type: is_normalized_string expects 'dict' for normalized_string argument but got '%s'.".format(type(normalized_string).__name__))
+
+    if language_codes is not None and not isinstance(language_codes, list):
+        raise TypeError("Invalid argument type: is_normalized_string expects 'list' for language_codes argument but got '%s'.".format(type(language_codes).__name__))
+
+    try:
+        return normalized_string and \
+               (True if language_codes is None else all(l in normalized_string for l in language_codes)) and \
+               all(is_language_code(k) and not is_empty_string(v) for k, v in normalized_string.iteritems())
+    except TypeError:
+        # The is_empty_string function will raise a TypeError if the code argument is not a
+        # string. So if the argument is not a string, it stands to reason that it's not a
+        # valid ISO code.
+        return False
