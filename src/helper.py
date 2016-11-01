@@ -207,3 +207,26 @@ def is_normalized_string(normalized_string, language_codes=None):
         # string. So if the argument is not a string, it stands to reason that it's not a
         # valid ISO code.
         return False
+
+
+def is_directory(path, check_writable=False): #pragma: no cover
+    """Checks if the specified path is a readable directory.
+
+    Args:
+        path (str): A path to a directory to check.
+        check_writable (bool): If set to True, the function checks if the directory is writable too.
+
+    Returns:
+        bool: True if the specified path is a readable directory, False otherwise. If check_writable
+            is set to True, True will be returned if the directory is read/writable, False otherwise.
+
+    Raises:
+        TypeError: If the path argument is not a string or check_writable argument is not a boolean.
+    """
+    if not isinstance(path, basestring):
+        raise TypeError("Invalid argument type: is_directory expects 'str' or 'unicode' for path argument but got '{}'.".format(type(path).__name__))
+    elif not isinstance(check_writable, bool):
+        raise TypeError("Invalid argument type: is_directory expects 'bool' for check_writable argument but got '{}'.".format(type(check_writable).__name__))
+
+    import os
+    return os.path.isdir(path) and os.access(path, os.R_OK | os.W_OK if check_writable else os.R_OK)
