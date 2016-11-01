@@ -44,6 +44,18 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertFalse(helper.is_empty_string("    Hello, World    "), "String with leading and trailing whitespace.")
         self.assertFalse(helper.is_empty_string("\r\n\t\\"), "Escape sequences with backslash character.")
 
+    def test_valid_urls(self):
+        self.assertTrue(helper.is_url("http://www.example.com"), "Simple URL")
+        self.assertTrue(helper.is_url("https://github.com/geotagx/geotagx-tool-sanitizer.git"), "Github repository URL")
+
+    def test_illegal_urls(self):
+        self.assertFalse(helper.is_url(None), "No value")
+        self.assertFalse(helper.is_url(""), "Empty string")
+        self.assertFalse(helper.is_url({}), "Non-string value (dictionary)")
+        self.assertFalse(helper.is_url(42), "Non-string value (number)")
+        self.assertFalse(helper.is_url("42"), "Unrecognized URL")
+        self.assertFalse(helper.is_url("www.example.com"), "Missing protocol")
+
     def test_valid_iso_3166_1_alpha_2_codes(self):
         self.assertTrue(helper.is_iso_3166_1_alpha_2_code("CH"), "Switzerland")
         self.assertTrue(helper.is_iso_3166_1_alpha_2_code("GB"), "United Kingdom")

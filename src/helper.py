@@ -46,6 +46,34 @@ def is_empty_string(empty_string):
     return not empty_string or empty_string.isspace()
 
 
+def is_url(url):
+    """Checks if the specified URL is valid.
+
+    Args:
+        url (str): A URL to check.
+
+    Returns:
+        bool: True if the specified URL is valid, False otherwise.
+    """
+    try:
+        if is_empty_string(url):
+            return False
+        else:
+            # The following code is inspired by the validators package from Konsta Vesterinen. Please
+            # refer to https://github.com/kvesteri/validators/blob/master/validators/url.py for more
+            # information.
+            import re
+            regex = (
+                r'^[a-z]+://([^/:]+\.[a-z]{2,10}|([0-9]{{1,3}}\.)'
+                r'{{3}}[0-9]{{1,3}})(:[0-9]+)?(\/.*)?$'
+            )
+            return re.compile(regex).match(url)
+    except TypeError:
+        # The is_empty_string function will raise a TypeError if the url argument is not a string.
+        # So if the argument is not a string, it stands to reason that it's not a valid URL.
+        return False
+
+
 def is_iso_3166_1_alpha_2_code(code):
     """Validates the specified ISO 3166-1 alpha-2 code.
 
