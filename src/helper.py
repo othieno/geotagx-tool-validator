@@ -57,9 +57,6 @@ def is_iso_3166_1_alpha_2_code(code):
 
     Returns:
         bool: True if the specified code is a valid ISO 3166-1 alpha-2 code, False otherwise.
-
-    Raises:
-        TypeError: If the code argument is not a string.
     """
     try:
         if is_empty_string(code):
@@ -70,6 +67,9 @@ def is_iso_3166_1_alpha_2_code(code):
             matches = match("[A-Z]{2}", code)
             return matches and matches.group() == code
     except TypeError:
+        # The is_empty_string function will raise a TypeError if the code argument is not a
+        # string. So if the argument is not a string, it stands to reason that it's not a
+        # valid ISO code.
         return False
 
 
@@ -84,9 +84,6 @@ def is_iso_15924_code(code):
 
     Returns:
         bool: True if the specified code is a valid ISO 15924 code, False otherwise.
-
-    Raises:
-        TypeError: If the code argument is not a string.
     """
     try:
         if is_empty_string(code):
@@ -96,4 +93,7 @@ def is_iso_15924_code(code):
             matches = match("[A-Z]{1}[a-z]{3}", code)
             return matches and matches.group() == code
     except TypeError:
+        # The is_empty_string function will raise a TypeError if the code argument is not a
+        # string. So if the argument is not a string, it stands to reason that it's not a
+        # valid ISO code.
         return False
