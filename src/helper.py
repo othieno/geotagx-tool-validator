@@ -295,7 +295,7 @@ def sanitize_paths(paths): #pragma: no cover
     return filter(is_project_path, set([realpath(p) for p in paths]))
 
 
-def deserialize_json(filename):
+def deserialize_json(filename): #pragma: no cover
     """Returns the JSON object from the file with the specified filename.
 
     Args:
@@ -310,3 +310,34 @@ def deserialize_json(filename):
     with open(filename) as file:
         import json, collections
         return json.loads(file.read(), object_pairs_hook=collections.OrderedDict)
+
+
+def deserialize_configurations(path): #pragma: no cover
+    """Deserializes the configuration files for GeoTag-X project located at the specified path.
+
+    Args:
+        path (str): A path to a directory containing a GeoTag-X project.
+
+    Returns:
+        dict|None: A dictionary containing deserialized JSON configurations if the specified
+            path contains a valid GeoTag-X project, None otherwise.
+
+    Raises:
+        TypeError: If the path argument is not a string.
+        IOError: If the specified path is inaccessible or not a directory, or if a required
+            configuration in the directory at the specified path is inaccessible.
+    """
+    if not is_project_path(path):
+        return None
+
+    configurations = {}
+    for key in ["project", "task_presenter", "tutorial"]:
+        try:
+            import os
+            configurations[key] = deserialize_json(os.path.join(path, key + ".json"))
+        except IOError:
+            # If the configuration is required, re-raise the exception.
+            if key in ["project", "task_presenter"]:
+                raise
+
+    return configurations
