@@ -73,7 +73,6 @@ def get_argparser(subparsers=None):
 
     options = parser.add_argument_group("OPTIONS")
     options.add_argument("-h", "--help", action="help", help="Display this help and exit.")
-    options.add_argument("-i", "--ignore-missing", action="store_true", help="Ignore missing configuration files.")
     options.add_argument("-q", "--quiet", action="store_true", help="Suppress all warnings.")
     options.add_argument("-v", "--verbose", action="store_true", help="Detail the actions being performed.")
     options.add_argument("-V", "--version", action="version", help="Display version information and exit.", version=_version())
