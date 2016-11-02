@@ -35,9 +35,33 @@ def run(arguments):
     """Executes the application with the specified command-line arguments.
 
     Args:
-        arguments (list): A list of command-line argument strings.
+        arguments (argparse.Namespace): A set of command-line arguments.
+
+    Returns:
+        int: 0 if validation was successful, 1 otherwise.
     """
-    raise NotImplementedError()
+    exit_code = 0
+    try:
+        import os, logging
+        if arguments.quiet:
+            log_level = logging.ERROR
+        elif arguments.verbose:
+            log_level = logging.INFO
+        else:
+            log_level = logging.WARNING
+
+        logging.basicConfig(format="[%(levelname)s] %(message)s", level=log_level)
+
+        validate_projects(arguments.paths, arguments.verbose)
+    except Exception as e:
+        exit_code = 1
+        if arguments.verbose or not str(e):
+            import traceback
+            traceback.print_exc()
+        else:
+            print "{0}: {1}".format(e.__class__.__name__, e)
+    finally:
+        return exit_code
 
 
 def get_argparser(subparsers=None):
@@ -69,7 +93,7 @@ def get_argparser(subparsers=None):
         parser = subparsers.add_parser("validate", help="Validate your GeoTag-X projects.", **parser_arguments)
         parser.set_defaults(run=run)
     else:
-        raise TypeError("Invalid parameter type: get_argparser expects 'argparse._SubParsersAction' but got '{}'.".format(type(subparsers).__name__))
+        raise TypeError("Invalid argument type: get_argparser expects 'argparse._SubParsersAction' but got '{}'.".format(type(subparsers).__name__))
 
     options = parser.add_argument_group("OPTIONS")
     options.add_argument("-h", "--help", action="help", help="Display this help and exit.")
@@ -87,6 +111,12 @@ def _version():
     """
     from __init__ import __version__
     return "GeoTag-X Project Validator v%s, Copyright (C) 2016 UNITAR/UNOSAT." % __version__
+
+
+def validate_projects(paths, verbose=False):
+    """Validates the projects at the specified paths.
+    """
+    raise NotImplementedError()
 
 
 if __name__ == "__main__":
