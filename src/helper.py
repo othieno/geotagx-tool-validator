@@ -293,3 +293,20 @@ def sanitize_paths(paths): #pragma: no cover
 
     from os.path import realpath
     return filter(is_project_path, set([realpath(p) for p in paths]))
+
+
+def deserialize_json(filename):
+    """Returns the JSON object from the file with the specified filename.
+
+    Args:
+        filename: The name of the file containing the JSON data to deserialize.
+
+    Returns:
+        dict: A dictionary containing the deserialized JSON data.
+
+    Raises:
+        IOError: If the file with the specified filename could not be opened.
+    """
+    with open(filename) as file:
+        import json, collections
+        return json.loads(file.read(), object_pairs_hook=collections.OrderedDict)
