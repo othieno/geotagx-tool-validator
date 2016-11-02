@@ -230,3 +230,44 @@ def is_directory(path, check_writable=False): #pragma: no cover
 
     import os
     return os.path.isdir(path) and os.access(path, os.R_OK | os.W_OK if check_writable else os.R_OK)
+
+
+def is_project_path(path, check_writable=True): #pragma: no cover
+    """Checks if the specified path is a directory that contains a GeoTag-X project.
+
+    For the purpose of the validator tool, a complete GeoTag-X project must contain
+    the following files:
+    - project.json: a project's configuration,
+    - task_presenter.json: a task presenter configuration.
+
+    Optionally, a project may contain a tutorial configuration (tutorial.json).
+
+    It is important to note that this function only makes sure the required configuration
+    files exist but does not validate their content.
+
+    Args:
+        path (str): A path to a directory to check.
+        check_writable (bool): If set to True, the function will also check if the directory
+            located at the specified path can be written to.
+
+    Returns:
+        bool: True if the specified path contains a complete GeoTag-X project, False otherwise.
+
+    Raises:
+        TypeError: If the path argument is not a string or check_writable is not a boolean.
+        IOError: If the specified path is inaccessible or not a directory.
+    """
+    if not is_directory(path, check_writable):
+        raise IOError("The path '{}' is not a directory or you may not have the appropriate access permissions.".format(path))
+    else:
+        import os
+        # Make sure the mandatory configurations exist and are readable.
+        filenames = [os.path.join(path, name) for name in is_project_path.REQUIRED_CONFIGURATION_FILES]
+        return all(os.path.isfile(f) and os.access(f, os.R_OK) for f in filenames)
+
+
+is_project_path.REQUIRED_CONFIGURATION_FILES = frozenset([
+    "project.json",
+    "task_presenter.json"
+])
+"""A set of required configuration files."""
