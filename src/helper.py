@@ -271,3 +271,25 @@ is_project_path.REQUIRED_CONFIGURATION_FILES = frozenset([
     "task_presenter.json"
 ])
 """A set of required configuration files."""
+
+
+def sanitize_paths(paths): #pragma: no cover
+    """Removes duplicates as well as paths that do not contain a valid GeoTag-X project.
+
+    Args:
+        paths (list): A list of paths to directories.
+
+    Returns:
+        list: A list of paths that contains no duplicates as well as directories that are
+            guaranteed to contain GeoTag-X configuration files. Note that the returned
+            list may be empty.
+
+    Raises:
+        TypeError: If the paths argument is not a list or one of its elements is not a string.
+        IOError: If a path is inaccessible or not a directory.
+    """
+    if not isinstance(paths, list):
+        raise TypeError("Invalid argument type: sanitize_paths expects 'list' but got '{}'.".format(type(paths).__name__))
+
+    from os.path import realpath
+    return filter(is_project_path, set([realpath(p) for p in paths]))
