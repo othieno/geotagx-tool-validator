@@ -78,7 +78,7 @@ def get_argparser(subparsers=None):
         argparse.ArgumentParser: A command-line argument parser instance.
 
     Raises:
-        TypeError: If subparsers is not None or an argparse._SubParsersAction instance.
+        TypeError: If the subparsers argument is not a NoneType or an argparse._SubParsersAction instance.
     """
     import argparse
 
