@@ -119,6 +119,18 @@ def validate_projects(paths, verbose=False):
     raise NotImplementedError()
 
 
+def _setup_logging(verbose=False):
+    """Sets up logging.
+
+    Args:
+        verbose (bool): If set to True, the validator will log most of its operations,
+            even the most mundane.
+    """
+    import logging
+    logging_level = logging.INFO if verbose else logging.WARNING
+    logging.basicConfig(format="[%(levelname)s] %(message)s", level=logging_level)
+
+
 def _print_exception(exception, verbose=True):
     """Prints the specified exception information.
     If the exception does not contain a message, the stack trace will be printed
