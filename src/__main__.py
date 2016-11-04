@@ -40,26 +40,26 @@ def run(arguments):
     Returns:
         int: 0 if validation was successful, 1 otherwise.
     """
+    from helper import sanitize_paths, deserialize_configurations
+    from validator import is_configuration_set
+
     exit_code = 0
     try:
-        import os, logging
-        if arguments.quiet:
-            log_level = logging.ERROR
-        elif arguments.verbose:
-            log_level = logging.INFO
-        else:
-            log_level = logging.WARNING
+        if not arguments.quiet:
+            _setup_logging(arguments.verbose)
 
-        logging.basicConfig(format="[%(levelname)s] %(message)s", level=log_level)
-
-        validate_projects(arguments.paths, arguments.verbose)
+        for path in sanitize_paths(arguments.paths):
+            configurations = deserialize_configurations(path)
+            valid, message = is_configuration_set(configurations, arguments.verbose)
+            if not valid:
+                print message
+                exit_code = 1
+                break
+            else:
+                print "'{}'... OK.".format(path)
     except Exception as e:
+        _print_exception(e, arguments.verbose)
         exit_code = 1
-        if arguments.verbose or not str(e):
-            import traceback
-            traceback.print_exc()
-        else:
-            print "{0}: {1}".format(e.__class__.__name__, e)
     finally:
         return exit_code
 
@@ -111,12 +111,6 @@ def _version():
     """
     from __init__ import __version__
     return "GeoTag-X Project Validator v%s, Copyright (C) 2016 UNITAR/UNOSAT." % __version__
-
-
-def validate_projects(paths, verbose=False):
-    """Validates the projects at the specified paths.
-    """
-    raise NotImplementedError()
 
 
 def _setup_logging(verbose=False):
