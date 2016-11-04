@@ -119,5 +119,21 @@ def validate_projects(paths, verbose=False):
     raise NotImplementedError()
 
 
+def _print_exception(exception, verbose=True):
+    """Prints the specified exception information.
+    If the exception does not contain a message, the stack trace will be printed
+    by default.
+
+    Args:
+        exception (Exception): The exception information to print.
+        verbose (bool): If set to True, the entire stack trace will be printed.
+    """
+    if not str(exception) or verbose:
+        import traceback
+        traceback.print_exc()
+    else:
+        print "{0}: {1}".format(exception.__class__.__name__, exception)
+
+
 if __name__ == "__main__":
     main()
