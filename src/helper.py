@@ -262,15 +262,8 @@ def is_project_path(path, check_writable=True): #pragma: no cover
     else:
         import os
         # Make sure the mandatory configurations exist and are readable.
-        filenames = [os.path.join(path, name) for name in is_project_path.REQUIRED_CONFIGURATION_FILES]
+        filenames = [os.path.join(path, name) for name in ["project.json", "task_presenter.json"]]
         return all(os.path.isfile(f) and os.access(f, os.R_OK) for f in filenames)
-
-
-is_project_path.REQUIRED_CONFIGURATION_FILES = frozenset([
-    "project.json",
-    "task_presenter.json"
-])
-"""A set of required configuration files."""
 
 
 def sanitize_paths(paths): #pragma: no cover
