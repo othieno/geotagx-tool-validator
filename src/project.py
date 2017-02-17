@@ -70,6 +70,7 @@ def is_project_name(name, enable_logging=False):
 
     Args:
         name (str): A project name to validate.
+        enable_logging (bool): If set to True, the function will log the operations it performs.
 
     Returns:
         <bool, str|None>: A pair containing the value True if the specified name is
@@ -82,7 +83,30 @@ def is_project_name(name, enable_logging=False):
 
 
 def is_project_short_name(short_name, enable_logging=False):
-    raise NotImplementedError()
+    """Validates the specified project short name.
+
+    A valid short name is a non-empty string that contains only alphanumeric
+    characters (a-z, A-Z, 0-9), hyphens (-) and underscores (_).
+
+    Args:
+        short_name (str): A project short name to validate.
+        enable_logging (bool): If set to True, the function will log the operations it performs.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the specified short name is
+            valid, False otherwise; and an error message in case the short name is invalid.
+    """
+    ERROR_MESSAGE = "A short name must be a non-empty string containing only of alphanumeric characters (a-z, A-Z, 0-9), hyphens (-) and underscores (_)."
+    try:
+        if is_empty_string(short_name):
+            return (False, ERROR_MESSAGE)
+        else:
+            from re import match
+            matches = match(r"[a-zA-Z0-9-_]+", short_name)
+            matched = matches and (matches.group() == short_name)
+            return (True, None) if matched else (False, ERROR_MESSAGE)
+    except TypeError:
+        return (False, "The 'short_name' argument must be a string.")
 
 
 def is_project_description(description, enable_logging=False):
