@@ -25,7 +25,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-from helper import is_empty_string
+from helper import is_empty_string, is_url
 
 def is_project_configuration(configuration, enable_logging=False):
     """Validates the specified project configuration.
@@ -129,4 +129,19 @@ def is_project_description(description, enable_logging=False):
 
 
 def is_project_repository(url, enable_logging=False):
-    raise NotImplementedError()
+    """Validates the specified project repository URL.
+
+    Args:
+        url (string): A URL to validate.
+        enable_logging (bool): If set to True, the function will log the operations it performs.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the specified URL
+            is valid, False otherwise; and an error message in case the URL is invalid.
+    """
+    if not isinstance(url, basestring):
+        return (False, "A repository URL must be a string.")
+    elif not is_url(url):
+        return (False, "A repository configuration must be a valid URL and include the URL protocol.")
+
+    return (True, None)
