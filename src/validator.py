@@ -4,7 +4,7 @@
 #
 # Author: Jeremy Othieno (j.othieno@gmail.com)
 #
-# Copyright (c) 2016 UNITAR/UNOSAT
+# Copyright (c) 2016-2017 UNITAR/UNOSAT
 #
 # The MIT License (MIT)
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,6 +24,10 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
+from project import is_project_configuration
+from task_presenter import is_task_presenter_configuration
+from tutorial import is_tutorial_configuration
+
 def is_configuration_set(configurations, enable_logging=False):
     """Validates the specified set of configurations.
 
@@ -57,9 +61,9 @@ def is_configuration_set(configurations, enable_logging=False):
 
     from functools import partial
     validators = {
-        "project": is_project,
-        "task_presenter": is_task_presenter,
-        "tutorial": partial(is_tutorial, task_presenter=configurations["task_presenter"]),
+        "project": is_project_configuration,
+        "task_presenter": is_task_presenter_configuration,
+        "tutorial": partial(is_tutorial_configuration, configurations["task_presenter"], validate_task_presenter_configuration=False),
     }
 
     for key, configuration in configurations.iteritems():
@@ -69,21 +73,3 @@ def is_configuration_set(configurations, enable_logging=False):
             return (False, message)
 
     return (True, None)
-
-
-def is_project(project, enable_logging=False):
-    """Validates the specified project configuration.
-    """
-    raise NotImplementedError()
-
-
-def is_task_presenter(task_presenter, enable_logging=False):
-    """Validates the specified task presenter configuration.
-    """
-    raise NotImplementedError()
-
-
-def is_tutorial(tutorial, task_presenter, enable_logging=False):
-    """Validates the specified tutorial configuration.
-    """
-    raise NotImplementedError()
