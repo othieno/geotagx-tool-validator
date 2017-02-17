@@ -110,7 +110,22 @@ def is_project_short_name(short_name, enable_logging=False):
 
 
 def is_project_description(description, enable_logging=False):
-    raise NotImplementedError()
+    """Validates the specified project description.
+
+    A valid description is simply a non-empty string.
+
+    Args:
+        description (str): A project description to validate.
+        enable_logging (bool): If set to True, the function will log the operations it performs.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the specified description
+            is valid, False otherwise; and an error message in case the description is invalid.
+    """
+    try:
+        return (False, "A project description must be a non-empty string.") if is_empty_string(description) else (True, None)
+    except TypeError:
+        return (False, "The 'description' argument must be a string.")
 
 
 def is_project_repository(url, enable_logging=False):
