@@ -25,6 +25,8 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
+from helper import is_empty_string
+
 def is_project_configuration(configuration, enable_logging=False):
     """Validates the specified project configuration.
 
@@ -62,7 +64,21 @@ def is_project_configuration(configuration, enable_logging=False):
 
 
 def is_project_name(name, enable_logging=False):
-    raise NotImplementedError()
+    """Validates the specified project name.
+
+    A valid name is simply a non-empty string.
+
+    Args:
+        name (str): A project name to validate.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the specified name is
+            valid, False otherwise; and an error message in case the name is invalid.
+    """
+    try:
+        return (False, "A project name must be a non-empty string.") if is_empty_string(name) else (True, None)
+    except TypeError:
+        return (False, "The 'name' argument must be a string.")
 
 
 def is_project_short_name(short_name, enable_logging=False):
