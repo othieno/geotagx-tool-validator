@@ -43,5 +43,35 @@ def is_project_configuration(configuration, enable_logging=False):
         raise TypeError("Invalid argument type: is_project_configuration expects 'dict' for the configuration argument but got '{}'.".format(type(configuration).__name__))
     elif not isinstance(enable_logging, bool):
         raise TypeError("Invalid argument type: is_project_configuration expects 'bool' for the enable_logging argument but got '{}'.".format(type(enable_logging).__name__))
+    elif not all(key in configuration for key in ["name", "short_name", "description"]):
+        raise ValueError("A required configuration is missing from the specified configuration set.")
 
+    validators = {
+        "name": is_project_name,
+        "short_name": is_project_short_name,
+        "description": is_project_description,
+        "repository": is_project_repository,
+    }
+    for key, configuration in configuration.iteritems():
+        validator = validators[key]
+        valid, message = validator(configuration, enable_logging=enable_logging)
+        if not valid:
+            return (False, message)
+
+    return (True, None)
+
+
+def is_project_name(name, enable_logging=False):
+    raise NotImplementedError()
+
+
+def is_project_short_name(short_name, enable_logging=False):
+    raise NotImplementedError()
+
+
+def is_project_description(description, enable_logging=False):
+    raise NotImplementedError()
+
+
+def is_project_repository(url, enable_logging=False):
     raise NotImplementedError()
