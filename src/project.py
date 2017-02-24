@@ -159,4 +159,5 @@ def is_project_do_not_track(do_not_track):
         <bool, str|None>: A pair containing the value True if the specified flag
             is valid, False otherwise; and an error message in case the flag is invalid.
     """
-    return (True, None) if isinstance(do_not_track, bool) else (False, "The 'do_not_track' argument must be a boolean.")
+    ERROR_MESSAGE = "The 'do_not_track' argument must be a boolean."
+    return (True, None) if isinstance(do_not_track, bool) else (False, ERROR_MESSAGE)
