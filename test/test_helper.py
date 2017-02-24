@@ -49,10 +49,11 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertTrue(helper.is_url("https://github.com/geotagx/geotagx-tool-sanitizer.git"), "Github repository URL")
 
     def test_illegal_urls(self):
-        self.assertFalse(helper.is_url(None), "No value")
+        self.assertRaises(TypeError, helper.is_empty_string, None)
+        self.assertRaises(TypeError, helper.is_empty_string, {})
+        self.assertRaises(TypeError, helper.is_empty_string, 42)
+        self.assertRaises(TypeError, helper.is_empty_string, [])
         self.assertFalse(helper.is_url(""), "Empty string")
-        self.assertFalse(helper.is_url({}), "Non-string value (dictionary)")
-        self.assertFalse(helper.is_url(42), "Non-string value (number)")
         self.assertFalse(helper.is_url("42"), "Unrecognized URL")
         self.assertFalse(helper.is_url("www.example.com"), "Missing protocol")
 

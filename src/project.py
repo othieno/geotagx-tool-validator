@@ -139,12 +139,13 @@ def is_project_repository(url):
         <bool, str|None>: A pair containing the value True if the specified URL
             is valid, False otherwise; and an error message in case the URL is invalid.
     """
-    if not isinstance(url, basestring):
-        return (False, "A repository URL must be a string.")
-    elif not is_url(url):
-        return (False, "A repository configuration must be a valid URL and include the URL protocol.")
-
-    return (True, None)
+    try:
+        ERROR_MESSAGE = "A repository configuration must be a valid URL and include the URL protocol."
+        return (True, None) if is_url(url) else (False, ERROR_MESSAGE)
+    except TypeError:
+        # The is_empty_string function will raise a TypeError if the url argument is not a string.
+        # If the argument is not a string, it stands to reason that it's not a valid URL.
+        return (False, "The 'url' argument must be a string.")
 
 
 def is_project_do_not_track(do_not_track):
