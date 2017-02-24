@@ -60,21 +60,20 @@ def is_project_configuration(configuration, enable_logging=False):
         if not validator:
             return (False, "The project configuration key '{}' is not recognized.".format(key))
 
-        valid, message = validator(configuration, enable_logging=enable_logging)
+        valid, message = validator(configuration)
         if not valid:
             return (False, message)
 
     return (True, None)
 
 
-def is_project_name(name, enable_logging=False):
+def is_project_name(name):
     """Validates the specified project name.
 
     A valid name is simply a non-empty string.
 
     Args:
         name (str): A project name to validate.
-        enable_logging (bool): If set to True, the function will log the operations it performs.
 
     Returns:
         <bool, str|None>: A pair containing the value True if the specified name is
@@ -86,7 +85,7 @@ def is_project_name(name, enable_logging=False):
         return (False, "The 'name' argument must be a string.")
 
 
-def is_project_short_name(short_name, enable_logging=False):
+def is_project_short_name(short_name):
     """Validates the specified project short name.
 
     A valid short name is a non-empty string that contains only alphanumeric
@@ -94,7 +93,6 @@ def is_project_short_name(short_name, enable_logging=False):
 
     Args:
         short_name (str): A project short name to validate.
-        enable_logging (bool): If set to True, the function will log the operations it performs.
 
     Returns:
         <bool, str|None>: A pair containing the value True if the specified short name is
@@ -113,14 +111,13 @@ def is_project_short_name(short_name, enable_logging=False):
         return (False, "The 'short_name' argument must be a string.")
 
 
-def is_project_description(description, enable_logging=False):
+def is_project_description(description):
     """Validates the specified project description.
 
     A valid description is simply a non-empty string.
 
     Args:
         description (str): A project description to validate.
-        enable_logging (bool): If set to True, the function will log the operations it performs.
 
     Returns:
         <bool, str|None>: A pair containing the value True if the specified description
@@ -132,12 +129,11 @@ def is_project_description(description, enable_logging=False):
         return (False, "The 'description' argument must be a string.")
 
 
-def is_project_repository(url, enable_logging=False):
+def is_project_repository(url):
     """Validates the specified project repository URL.
 
     Args:
         url (string): A URL to validate.
-        enable_logging (bool): If set to True, the function will log the operations it performs.
 
     Returns:
         <bool, str|None>: A pair containing the value True if the specified URL
@@ -151,14 +147,13 @@ def is_project_repository(url, enable_logging=False):
     return (True, None)
 
 
-def is_project_do_not_track(do_not_track, enable_logging=False):
+def is_project_do_not_track(do_not_track):
     """Validates the specified project 'Do Not Track' flag.
 
     A flag is nothing but a boolean value.
 
     Args:
         do_not_track (bool): A flag to validate.
-        enable_logging (bool): If set to True, the function will log the operations it performs.
 
     Returns:
         <bool, str|None>: A pair containing the value True if the specified flag
