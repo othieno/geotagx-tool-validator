@@ -55,7 +55,10 @@ def is_project_configuration(configuration, enable_logging=False):
         "repository": is_project_repository,
     }
     for key, configuration in configuration.iteritems():
-        validator = validators[key]
+        validator = validators.get(key)
+        if not validator:
+            return (False, "The project configuration key '{}' is not recognized.".format(key))
+
         valid, message = validator(configuration, enable_logging=enable_logging)
         if not valid:
             return (False, message)
