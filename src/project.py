@@ -53,6 +53,7 @@ def is_project_configuration(configuration, enable_logging=False):
         "short_name": is_project_short_name,
         "description": is_project_description,
         "repository": is_project_repository,
+        "do_not_track": is_project_do_not_track,
     }
     for key, configuration in configuration.iteritems():
         validator = validators.get(key)
@@ -148,3 +149,19 @@ def is_project_repository(url, enable_logging=False):
         return (False, "A repository configuration must be a valid URL and include the URL protocol.")
 
     return (True, None)
+
+
+def is_project_do_not_track(do_not_track, enable_logging=False):
+    """Validates the specified project 'Do Not Track' flag.
+
+    A flag is nothing but a boolean value.
+
+    Args:
+        do_not_track (bool): A flag to validate.
+        enable_logging (bool): If set to True, the function will log the operations it performs.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the specified flag
+            is valid, False otherwise; and an error message in case the flag is invalid.
+    """
+    return (True, None) if isinstance(do_not_track, bool) else (False, "The 'do_not_track' argument must be a boolean.")
