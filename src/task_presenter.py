@@ -96,7 +96,22 @@ def is_task_presenter_subject(subject):
         <bool, str|None>: A pair containing the value True if the specified configuration
             is valid, False otherwise; as well as an error message in case it is invalid.
     """
-    raise NotImplementedError()
+    if not isinstance(subject, dict):
+        raise TypeError("Invalid argument type: is_task_presenter_subject expects 'dict' for the subject argument but got '{}'.".format(type(subject).__name__))
+
+    validators = {
+        "type": is_subject_type,
+    }
+    for key, configuration in subject.iteritems():
+        validator = validators.get(key)
+        if not validator:
+            return (False, "The task presenter subject configuration key '{}' is not recognized.".format(key))
+
+        valid, message = validator(configuration)
+        if not valid:
+            return (False, message)
+
+    return (True, None)
 
 
 def is_task_presenter_questionnaire(questionnaire, available_languages=None):
