@@ -117,3 +117,32 @@ def is_task_presenter_questionnaire(questionnaire, available_languages=None):
         TypeError: If the 'available_languages' argument is not a list.
     """
     raise NotImplementedError()
+
+
+def is_subject_type(subject_type):
+    """Validates the specified subject type.
+
+    Args:
+        subject_type (str): A subject type to validate.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the specified subject type
+            is valid, False otherwise; as well as an error message in case it is invalid.
+    """
+    from helper import is_empty_string
+    try:
+        if is_empty_string(subject_type):
+            return (False, "A subject type must be a non-empty string.")
+        elif subject_type not in is_subject_type.SUPPORTED_TYPES:
+            return (False, "The subject type '{}' is not recognized.".format(subject_type))
+
+        return (True, None)
+    except TypeError:
+        return (False, "The 'subject_type' argument must be a string.")
+
+
+is_subject_type.SUPPORTED_TYPES = frozenset([
+    "image",
+    "pdf",
+])
+"""A collection of supported subject types."""
