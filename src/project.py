@@ -45,8 +45,10 @@ def is_project_configuration(configuration, enable_logging=False):
         raise TypeError("Invalid argument type: is_project_configuration expects 'dict' for the configuration argument but got '{}'.".format(type(configuration).__name__))
     elif not isinstance(enable_logging, bool):
         raise TypeError("Invalid argument type: is_project_configuration expects 'bool' for the enable_logging argument but got '{}'.".format(type(enable_logging).__name__))
-    elif not all(key in configuration for key in ["name", "short_name", "description"]):
-        raise ValueError("A required configuration is missing from the specified configuration set.")
+
+    missing = [k for k in ["name", "short_name", "description"] if k not in configuration]
+    if missing:
+        return (False, "The project configuration is missing the following fields: '{}'.".format("', '".join(missing)))
 
     validators = {
         "name": is_project_name,
