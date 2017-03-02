@@ -27,77 +27,6 @@
 # OR OTHER DEALINGS IN THE SOFTWARE.
 from helper import is_empty_string
 
-def is_key(key):
-    """Validates the specified question key.
-
-    A key is a non-empty string that is strictly composed of alphanumeric
-    characters (a-Z, A-Z, 0-9), hyphens (-) or underscores (_). It must also
-    not begin with an underscore as those are keys reserved for internal use.
-
-    Args:
-        key (str): A question key to validate.
-
-    Returns:
-        <bool, str|None>: A pair containing the value True if the specified question key
-            is valid, False otherwise; as well as an error message in case validation fails.
-    """
-    try:
-        ERROR_MESSAGE = "A question key must be a non-empty string strictly composed of alphanumeric characters (a-z, A-Z, 0-9), hyphens (-) or underscores (_). It must never begin with an underscore."
-        if is_empty_string(key):
-            return (False, ERROR_MESSAGE)
-        else:
-            from re import match
-            matches = match("(?!_)[a-zA-Z0-9-_]+", key)
-            valid = matches and matches.group() == key
-            return (True, None) if valid else (False, ERROR_MESSAGE)
-    except TypeError:
-        return (False, "The key argument must be a non-empty string.")
-
-
-def is_reserved_key(key):
-    """Validates the specified reserved question key.
-
-    A key is a non-empty string that is strictly composed of alphanumeric
-    characters (a-Z, A-Z, 0-9), hyphens (-) or underscores (_). A reserved key
-    is almost identical to a regular question key with one slight difference: it
-    must always begin with an underscore.
-
-    Args:
-        key (str): A reserved key to validate.
-
-    Returns:
-        bool: True if the specified key is valid and reserved for internal use,
-        False otherwise.
-    """
-    try:
-        ERROR_MESSAGE = "A reserved key must be a non-empty string strictly composed of alphanumeric characters (a-z, A-Z, 0-9), hyphens (-) or underscores (_). It must always begin with an underscore."
-        if is_empty_string(key):
-            return (False, ERROR_MESSAGE)
-        else:
-            from re import match
-            matches = match("_+[a-zA-Z0-9-_]+", key)
-            valid = matches and matches.group() == key
-            return (True, None) if valid else (False, ERROR_MESSAGE)
-    except TypeError:
-        return (False, "The key argument must be a non-empty string.")
-
-
-def is_title(question_title, available_languages=None): # pragma: no cover
-    raise NotImplementedError()
-
-
-def is_help(question_help, available_languages=None): # pragma: no cover
-    raise NotImplementedError()
-
-
-def is_input(question_input, available_languages=None): # pragma: no cover
-    raise NotImplementedError()
-
-
-def is_control_flow(question_branch): # pragma: no cover
-    raise NotImplementedError()
-
-
 def is_question(question, available_languages=None):
     """Validates the specified question configuration.
 
@@ -117,32 +46,116 @@ def is_question(question, available_languages=None):
     Returns:
         <bool, str|None>: A pair containing the value True if the specified configuration
             is valid, False otherwise; as well as an error message in case it is invalid.
+
+    Raises:
+        TypeError: If the question argument is not a dictionary or available_languages is
+        not a list or NoneType.
     """
-    if not isinstance(question, dict) or not question:
-        return (False, "The question argument must be a non-empty dictionary.")
+    if not isinstance(question, dict):
+        raise TypeError("Invalid argument type: is_question expects 'dict' for the question argument but got '{}'.".format(type(question).__name__))
+    elif available_languages is not None and not isinstance(available_languages, list):
+        raise TypeError("Invalid argument type: is_question expects 'list' for the available_languages argument but got '{}'.".format(type(available_languages).__name__))
+
+    missing = [k for k in is_question.REQUIRED_FIELDS if k not in question or question[k] is None]
+    if missing:
+        message = "The question configuration is missing the following fields: '{}'."
+        return (False, message.format("', '".join(missing)))
 
     from functools import partial
-    VALIDATORS = {
-        "key": is_key,
-        "title": partial(is_title, available_languages=available_languages),
-        "hint": partial(is_help, available_languages=available_languages),
-        "help": partial(is_help, available_languages=available_languages),
-        "input": partial(is_input, available_languages=available_languages),
-        "branch": is_control_flow,
+    validators = {
+        "key": is_question_key,
+        "title": partial(is_question_title, available_languages=available_languages),
+        "hint": partial(is_question_help, available_languages=available_languages),
+        "help": partial(is_question_help, available_languages=available_languages),
+        "input": partial(is_question_input, available_languages=available_languages),
+        "branch": is_question_branch,
     }
+    for key, configuration in question.iteritems():
+        validator = validators.get(key)
+        if not validator:
+            return (False, "The question configuration key '{}' is not recognized.".format(key))
 
-    for key in VALIDATORS.keys():
-        field = question.get(key)
-        if field is None and key in is_question.REQUIRED_FIELD_KEYS:
-            return (False, "The question configuration must contain the '{}' field.".format(key))
-        elif field:
-            validator = VALIDATORS[key]
-            valid, message = validator(field)
-            if not valid:
-                return (False, message)
+        valid, message = validator(configuration)
+        if not valid:
+            return (False, message)
 
     return (True, None)
 
 
-is_question.REQUIRED_FIELD_KEYS = frozenset(["key", "title", "input"])
+is_question.REQUIRED_FIELDS = frozenset([
+    "key",
+    "title",
+    "input"
+])
 """A set of required question fields."""
+
+
+def is_question_key(key):
+    """Validates the specified question key.
+
+    A key is a non-empty string that is strictly composed of alphanumeric
+    characters (a-Z, A-Z, 0-9), hyphens (-) or underscores (_). It must also
+    not begin with an underscore as those are keys reserved for internal use.
+
+    Args:
+        key (str): A question key to validate.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the specified question key
+            is valid, False otherwise; as well as an error message in case validation fails.
+
+    Raises:
+        TypeError: If the key argument is not a string.
+    """
+    message = "A question key must be a non-empty string strictly composed of alphanumeric characters (a-z, A-Z, 0-9), hyphens (-) or underscores (_). It must never begin with an underscore."
+    if is_empty_string(key):
+        return (False, message)
+    else:
+        from re import match
+        matches = match("(?!_)[a-zA-Z0-9-_]+", key)
+        valid = matches and matches.group() == key
+        return (True, None) if valid else (False, message)
+
+
+def is_reserved_question_key(key):
+    """Validates the specified reserved question key.
+
+    A key is a non-empty string that is strictly composed of alphanumeric
+    characters (a-Z, A-Z, 0-9), hyphens (-) or underscores (_). A reserved key
+    is almost identical to a regular question key with one slight difference: it
+    must always begin with an underscore.
+
+    Args:
+        key (str): A reserved key to validate.
+
+    Returns:
+        bool: True if the specified key is valid and reserved for internal use,
+        False otherwise.
+
+    Raises:
+        TypeError: If the key argument is not a string.
+    """
+    message = "A reserved key must be a non-empty string strictly composed of alphanumeric characters (a-z, A-Z, 0-9), hyphens (-) or underscores (_). It must always begin with an underscore."
+    if is_empty_string(key):
+        return (False, message)
+    else:
+        from re import match
+        matches = match("_+[a-zA-Z0-9-_]+", key)
+        valid = matches and matches.group() == key
+        return (True, None) if valid else (False, message)
+
+
+def is_question_title(question_title, available_languages=None): # pragma: no cover
+    raise NotImplementedError()
+
+
+def is_question_help(question_help, available_languages=None): # pragma: no cover
+    raise NotImplementedError()
+
+
+def is_question_branch(question_branch): # pragma: no cover
+    raise NotImplementedError()
+
+
+def is_question_input(question_input, available_languages=None): # pragma: no cover
+    raise NotImplementedError()

@@ -187,7 +187,27 @@ def is_task_presenter_questionnaire(questionnaire, available_languages=None):
         TypeError: If the questionnaire argument is not a dictionary or available_languages
         is not a list or NoneType.
     """
-    raise NotImplementedError()
+    if not isinstance(questionnaire, dict):
+        raise TypeError("Invalid argument type: is_task_presenter_questionnaire expects 'dict' for the questionnaire argument but got '{}'.".format(type(questionnaire).__name__))
+    elif available_languages is not None and not isinstance(available_languages, list):
+        raise TypeError("Invalid argument type: is_task_presenter_questionnaire expects 'list' for the available_languages argument but got '{}'.".format(type(available_languages).__name__))
+
+    missing = [k for k in ["questions"] if k not in questionnaire]
+    if missing:
+        message = "The task presenter's questionnaire configuration is missing the following fields: '{}'."
+        return (False, message.format("', '".join(missing)))
+
+    questions = questionnaire["questions"]
+    if not isinstance(questions, list) or len(questions) < 1:
+        return (False, "A questionnaire must have a non-empty list of questions.")
+    else:
+        from question import is_question
+        for q in questions:
+            valid, message = is_question(q, available_languages)
+            if not valid:
+                return (False, message)
+
+    return (True, None)
 
 
 def is_subject_type(subject_type):
