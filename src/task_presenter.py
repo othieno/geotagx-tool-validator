@@ -80,7 +80,30 @@ def is_task_presenter_language(language):
         <bool, str|None>: A pair containing the value True if the specified configuration
             valid, False otherwise; as well as an error message in case it is invalid.
     """
-    raise NotImplementedError()
+    from helper import is_language_code
+
+    if not isinstance(language, dict):
+        raise TypeError("Invalid argument type: is_task_presenter_language expects 'dict' for the language argument but got '{}'.".format(type(language).__name__))
+
+    missing = [k for k in ["default", "available"] if k not in language]
+    if missing:
+        return (False, "The task presenter's language configuration is missing the following fields: '%s'." % "', '".join(missing))
+
+    available_languages = language["available"]
+    if not isinstance(available_languages, list) or len(available_languages) < 1:
+        return (False, "The list of available languages must be a non-empty list of language codes.")
+
+    invalid_language_codes = [l for l in available_languages if not is_language_code(l)]
+    if invalid_language_codes:
+        message = "The task presenter's list of available languages contains the following invalid codes: '{}'."
+        return (False, message.format("', '".join(invalid_language_codes)))
+
+    default_language = language["default"]
+    if default_language not in available_languages:
+        message = "The task presenter's default language '{}' is not listed as an available language."
+        return (False, message.format(default_language))
+
+    return (True, None)
 
 
 def is_task_presenter_subject(subject):
