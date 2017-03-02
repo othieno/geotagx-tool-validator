@@ -25,6 +25,8 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
+from helper import is_language_code, is_empty_string
+
 def is_task_presenter_configuration(configuration, enable_logging=False):
     """Validates the specified task presenter configuration.
 
@@ -44,9 +46,10 @@ def is_task_presenter_configuration(configuration, enable_logging=False):
     elif not isinstance(enable_logging, bool):
         raise TypeError("Invalid argument type: is_task_presenter_configuration expects 'bool' for the enable_logging argument but got '{}'.".format(type(enable_logging).__name__))
 
-    missing = [k for k in ["questionnaire"] if k not in configuration]
+    missing = [k for k in is_task_presenter_configuration.REQUIRED_FIELDS if k not in configuration]
     if missing:
-        return (False, "The task presenter configuration is missing the following fields: '{}'.".format("', '".join(missing)))
+        message = "The task presenter configuration is missing the following fields: '{}'."
+        return (False, message.format("', '".join(missing)))
 
     validators = {
         "language": is_task_presenter_language,
@@ -65,6 +68,12 @@ def is_task_presenter_configuration(configuration, enable_logging=False):
     return (True, None)
 
 
+is_task_presenter_configuration.REQUIRED_FIELDS = frozenset([
+    "questionnaire"
+])
+"""A set of required task presenter configuration fields."""
+
+
 def is_task_presenter_language(language):
     """Validates the specified language configuration.
 
@@ -79,15 +88,17 @@ def is_task_presenter_language(language):
     Returns:
         <bool, str|None>: A pair containing the value True if the specified configuration
             valid, False otherwise; as well as an error message in case it is invalid.
-    """
-    from helper import is_language_code
 
+    Raises:
+        TypeError: If the 'language' argument is not a dictionary.
+    """
     if not isinstance(language, dict):
         raise TypeError("Invalid argument type: is_task_presenter_language expects 'dict' for the language argument but got '{}'.".format(type(language).__name__))
 
-    missing = [k for k in ["default", "available"] if k not in language]
+    missing = [k for k in is_task_presenter_language.REQUIRED_FIELDS if k not in language]
     if missing:
-        return (False, "The task presenter's language configuration is missing the following fields: '%s'." % "', '".join(missing))
+        message = "The task presenter's language configuration is missing the following fields: '{}'."
+        return (False, message.format("', '".join(missing)))
 
     available_languages = language["available"]
     if not isinstance(available_languages, list) or len(available_languages) < 1:
@@ -106,6 +117,13 @@ def is_task_presenter_language(language):
     return (True, None)
 
 
+is_task_presenter_language.REQUIRED_FIELDS = frozenset([
+    "default",
+    "available",
+])
+"""A set of required language configuration fields."""
+
+
 def is_task_presenter_subject(subject):
     """Validates the specified subject configuration.
 
@@ -118,9 +136,17 @@ def is_task_presenter_subject(subject):
     Returns:
         <bool, str|None>: A pair containing the value True if the specified configuration
             is valid, False otherwise; as well as an error message in case it is invalid.
+
+    Raises:
+        TypeError: If the 'subject' argument is not a dictionary.
     """
     if not isinstance(subject, dict):
         raise TypeError("Invalid argument type: is_task_presenter_subject expects 'dict' for the subject argument but got '{}'.".format(type(subject).__name__))
+
+    missing = [k for k in is_task_presenter_subject.REQUIRED_FIELDS if k not in subject]
+    if missing:
+        message = "The task presenter's subject configuration is missing the following fields: '{}'."
+        return (False, message.format("', '".join(missing)))
 
     validators = {
         "type": is_subject_type,
@@ -135,6 +161,12 @@ def is_task_presenter_subject(subject):
             return (False, message)
 
     return (True, None)
+
+
+is_task_presenter_subject.REQUIRED_FIELDS = frozenset([
+    "type",
+])
+"""A set of required subject configuration fields."""
 
 
 def is_task_presenter_questionnaire(questionnaire, available_languages=None):
@@ -152,7 +184,8 @@ def is_task_presenter_questionnaire(questionnaire, available_languages=None):
             is valid, False otherwise; as well as an error message in case it is invalid.
 
     Raises:
-        TypeError: If the 'available_languages' argument is not a list.
+        TypeError: If the questionnaire argument is not a dictionary or available_languages
+        is not a list or NoneType.
     """
     raise NotImplementedError()
 
@@ -166,17 +199,16 @@ def is_subject_type(subject_type):
     Returns:
         <bool, str|None>: A pair containing the value True if the specified subject type
             is valid, False otherwise; as well as an error message in case it is invalid.
-    """
-    from helper import is_empty_string
-    try:
-        if is_empty_string(subject_type):
-            return (False, "A subject type must be a non-empty string.")
-        elif subject_type not in is_subject_type.SUPPORTED_TYPES:
-            return (False, "The subject type '{}' is not recognized.".format(subject_type))
 
-        return (True, None)
-    except TypeError:
-        return (False, "The 'subject_type' argument must be a string.")
+    Raises:
+        TypeError: If the 'subject_type' argument is not a string.
+    """
+    if is_empty_string(subject_type):
+        return (False, "A subject type must be a non-empty string.")
+    elif subject_type not in is_subject_type.SUPPORTED_TYPES:
+        return (False, "The subject type '{}' is not recognized.".format(subject_type))
+
+    return (True, None)
 
 
 is_subject_type.SUPPORTED_TYPES = frozenset([
