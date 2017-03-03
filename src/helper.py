@@ -265,10 +265,10 @@ def is_project_directory(path, check_writable=True): #pragma: no cover
 
 
 def sanitize_paths(paths): #pragma: no cover
-    """Removes duplicates as well as paths that do not contain a valid GeoTag-X project.
+    """Removes duplicates as well as paths that do not lead to a valid GeoTag-X project directory.
 
     Args:
-        paths (list): A list of paths to directories.
+        paths (list): A list of paths to sanitize.
 
     Returns:
         list: A list of paths that contains no duplicates as well as directories that are
@@ -280,7 +280,7 @@ def sanitize_paths(paths): #pragma: no cover
         IOError: If a path is inaccessible or not a directory.
     """
     if not isinstance(paths, list):
-        raise TypeError("Invalid argument type: sanitize_paths expects 'list' but got '{}'.".format(type(paths).__name__))
+        raise TypeError("Invalid argument type: sanitize_paths expects 'list' for paths argument but got '{}'.".format(type(paths).__name__))
 
     from os.path import realpath
     return filter(is_project_directory, set([realpath(p) for p in paths]))
