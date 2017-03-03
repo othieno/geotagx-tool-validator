@@ -176,8 +176,35 @@ def is_question_title(question_title, languages=None):
         raise TypeError("Invalid argument type: is_question_title expects 'basestring' or 'dict' for the question_title argument but got '{}'.".format(type(question_title).__name__))
 
 
-def is_question_help(question_help, languages=None): # pragma: no cover
-    raise NotImplementedError()
+def is_question_help(question_help, languages=None):
+    """Validates the specified question help.
+
+    A help is a non-empty or normalized string.
+
+    Args:
+        help (str|dict): The help to validate.
+        languages (list): A list of languages that the normalized string dictionary must contain, where each item of the
+            list is a language code. Note that this parameter is used if and only if the help is a normalized string.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the help is valid,
+            False otherwise; as well as an error message in case it is invalid.
+
+    Raises:
+        TypeError: If the question_help argument is not a string or dictionary, or if
+            languages is not a list or NoneType.
+    """
+    if isinstance(question_help, basestring):
+        message = "A question help must be a non-empty string."
+        return (False, message) if is_empty_string(question_help) else (True, None)
+    elif isinstance(question_help, dict):
+        if languages is not None and not isinstance(languages, list):
+            raise TypeError("Invalid argument type: is_question_help expects 'list' or 'NoneType' for the languages argument but got '{}'.".format(type(languages).__name__))
+
+        message = "The question help is not a valid normalized string."
+        return (True, None) if is_normalized_string(question_help, languages) else (False, message)
+    else:
+        raise TypeError("Invalid argument type: is_question_help expects 'basestring' or 'dict' for the question_help argument but got '{}'.".format(type(question_help).__name__))
 
 
 def is_question_branch(question_branch): # pragma: no cover
