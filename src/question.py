@@ -25,7 +25,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-from helper import is_empty_string
+from helper import is_empty_string, is_normalized_string
 
 def is_question(question, available_languages=None):
     """Validates the specified question configuration.
@@ -64,10 +64,10 @@ def is_question(question, available_languages=None):
     from functools import partial
     validators = {
         "key": is_question_key,
-        "title": partial(is_question_title, available_languages=available_languages),
-        "hint": partial(is_question_help, available_languages=available_languages),
-        "help": partial(is_question_help, available_languages=available_languages),
-        "input": partial(is_question_input, available_languages=available_languages),
+        "title": partial(is_question_title, languages=available_languages),
+        "hint": partial(is_question_help, languages=available_languages),
+        "help": partial(is_question_help, languages=available_languages),
+        "input": partial(is_question_input, languages=available_languages),
         "branch": is_question_branch,
     }
     for key, configuration in question.iteritems():
@@ -145,11 +145,38 @@ def is_reserved_question_key(key):
         return (True, None) if valid else (False, message)
 
 
-def is_question_title(question_title, available_languages=None): # pragma: no cover
-    raise NotImplementedError()
+def is_question_title(question_title, languages=None):
+    """Validates the specified question title.
+
+    A title is a non-empty or normalized string.
+
+    Args:
+        title (str|dict): A title to validate.
+        languages (list): A list of languages that the normalized string dictionary must contain, where each item of the
+            list is a language code. Note that this parameter is used if and only if the title is a normalized string.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the title is valid,
+            False otherwise; as well as an error message in case it is invalid.
+
+    Raises:
+        TypeError: If the question_title argument is not a string or dictionary, or if
+            languages is not a list or NoneType.
+    """
+    if isinstance(question_title, basestring):
+        message = "A question title must be a non-empty string."
+        return (False, message) if is_empty_string(question_title) else (True, None)
+    elif isinstance(question_title, dict):
+        if languages is not None and not isinstance(languages, list):
+            raise TypeError("Invalid argument type: is_question_title expects 'list' or 'NoneType' for the languages argument but got '{}'.".format(type(languages).__name__))
+
+        message = "The question title is not a valid normalized string."
+        return (True, None) if is_normalized_string(question_title, languages) else (False, message)
+    else:
+        raise TypeError("Invalid argument type: is_question_title expects 'basestring' or 'dict' for the question_title argument but got '{}'.".format(type(question_title).__name__))
 
 
-def is_question_help(question_help, available_languages=None): # pragma: no cover
+def is_question_help(question_help, languages=None): # pragma: no cover
     raise NotImplementedError()
 
 
@@ -157,5 +184,5 @@ def is_question_branch(question_branch): # pragma: no cover
     raise NotImplementedError()
 
 
-def is_question_input(question_input, available_languages=None): # pragma: no cover
+def is_question_input(question_input, languages=None): # pragma: no cover
     raise NotImplementedError()
