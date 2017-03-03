@@ -230,7 +230,7 @@ def is_directory(path, check_writable=False): #pragma: no cover
     return os.path.isdir(path) and os.access(path, os.R_OK | os.W_OK if check_writable else os.R_OK)
 
 
-def is_project_path(path, check_writable=True): #pragma: no cover
+def is_project_directory(path, check_writable=True): #pragma: no cover
     """Checks if the specified path is a directory that contains a GeoTag-X project.
 
     For the purpose of the validator tool, a complete GeoTag-X project must contain
@@ -283,7 +283,7 @@ def sanitize_paths(paths): #pragma: no cover
         raise TypeError("Invalid argument type: sanitize_paths expects 'list' but got '{}'.".format(type(paths).__name__))
 
     from os.path import realpath
-    return filter(is_project_path, set([realpath(p) for p in paths]))
+    return filter(is_project_directory, set([realpath(p) for p in paths]))
 
 
 def deserialize_json(filename): #pragma: no cover
@@ -318,7 +318,7 @@ def deserialize_configurations(path): #pragma: no cover
         IOError: If the specified path is inaccessible or not a directory, or if a required
             configuration in the directory at the specified path is inaccessible.
     """
-    if not is_project_path(path):
+    if not is_project_directory(path):
         return None
 
     configurations = {}
