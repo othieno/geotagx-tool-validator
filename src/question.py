@@ -208,6 +208,21 @@ def is_question_help(question_help, languages=None):
 
 
 def is_question_branch(question_branch): # pragma: no cover
+    """Validates the specified question branch.
+
+    A branch is either a non-empty string which is a valid question or reserved key,
+    or a dictionary where each possible question answer is mapped to a key.
+
+    Args:
+        question_branch (str|dict): A branch to validate.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the branch is valid,
+            False otherwise; as well as an error message in case it is invalid.
+
+    Raises:
+        TypeError: If the question_branch argument is not a string or dictionary.
+    """
     raise NotImplementedError()
 
 
