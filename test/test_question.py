@@ -88,11 +88,28 @@ class TestQuestionValidators(unittest.TestCase):
         self.assertFalse(validator.is_question_title({42:"This is an invalid title."})[0], "Normalized title with illegal language code")
         self.assertFalse(validator.is_question_title({"fr-Latin":"Ceci est un rappel."})[0], "Normalized title with illegal language code")
 
+    def test_valid_question_help(self):
+        self.assertTrue(validator.is_question_help("This is not a helpful question hint.")[0], "Simple hint")
+        self.assertTrue(validator.is_question_help({"en":"Is this a normalized hint?"})[0], "Normalized hint")
+
+    def test_illegal_question_help(self):
+        self.assertRaises(TypeError, validator.is_question_help, None)
+        self.assertRaises(TypeError, validator.is_question_help, 42)
+        self.assertRaises(TypeError, validator.is_question_help, [])
+        self.assertRaises(TypeError, validator.is_question_help, {"la":"Et tu, Brute?"}, 42)
+        self.assertRaises(TypeError, validator.is_question_help, {"la":"Et tu, Brute?"}, {})
+        self.assertFalse(validator.is_question_help({"en":None})[0], "No normalized hint")
+        self.assertFalse(validator.is_question_help({"en":""})[0], "Empty normalized hint")
+        self.assertFalse(validator.is_question_help({"en":"     "})[0], "Whitespace only")
+        self.assertFalse(validator.is_question_help({42:"This is an invalid hint."})[0], "Normalized hint with illegal language code")
+        self.assertFalse(validator.is_question_help({"fr-Latin":"Ceci est un rappel."})[0], "Normalized hint with illegal language code")
+
     def test_valid_questions(self):
         pass
 
     def test_illegal_questions(self):
         self.assertRaises(TypeError, validator.is_question, None)
-        self.assertRaises(TypeError, validator.is_question, "")
         self.assertRaises(TypeError, validator.is_question, 42)
+        self.assertRaises(TypeError, validator.is_question, [])
+        self.assertRaises(TypeError, validator.is_question, "")
         self.assertFalse(validator.is_question({})[0], "Empty dict")
