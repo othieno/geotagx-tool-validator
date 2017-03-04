@@ -29,6 +29,16 @@ import unittest
 import question as validator
 
 class TestQuestionValidators(unittest.TestCase):
+    def test_valid_questions(self):
+        pass
+
+    def test_illegal_questions(self):
+        self.assertRaises(TypeError, validator.is_question, None)
+        self.assertRaises(TypeError, validator.is_question, 42)
+        self.assertRaises(TypeError, validator.is_question, [])
+        self.assertRaises(TypeError, validator.is_question, "")
+        self.assertFalse(validator.is_question({})[0], "Empty dict")
+
     def test_valid_question_keys(self):
         self.assertTrue(validator.is_question_key("A")[0], "Single-character")
         self.assertTrue(validator.is_question_key("key")[0], "String")
@@ -104,12 +114,14 @@ class TestQuestionValidators(unittest.TestCase):
         self.assertFalse(validator.is_question_help({42:"This is an invalid hint."})[0], "Normalized hint with illegal language code")
         self.assertFalse(validator.is_question_help({"fr-Latin":"Ceci est un rappel."})[0], "Normalized hint with illegal language code")
 
-    def test_valid_questions(self):
-        pass
+    def test_valid_question_branches(self):
+        self.assertRaises(NotImplementedError, validator.is_question_branch, None)
 
-    def test_illegal_questions(self):
-        self.assertRaises(TypeError, validator.is_question, None)
-        self.assertRaises(TypeError, validator.is_question, 42)
-        self.assertRaises(TypeError, validator.is_question, [])
-        self.assertRaises(TypeError, validator.is_question, "")
-        self.assertFalse(validator.is_question({})[0], "Empty dict")
+    def test_illegal_question_branches(self):
+        self.assertRaises(NotImplementedError, validator.is_question_branch, None)
+
+    def test_valid_question_input(self):
+        self.assertRaises(NotImplementedError, validator.is_question_input, None)
+
+    def test_illegal_question_input(self):
+        self.assertRaises(NotImplementedError, validator.is_question_input, None)

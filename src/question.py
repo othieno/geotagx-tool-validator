@@ -207,7 +207,7 @@ def is_question_help(question_help, languages=None):
         raise TypeError("Invalid argument type: is_question_help expects 'basestring' or 'dict' for the question_help argument but got '{}'.".format(type(question_help).__name__))
 
 
-def is_question_branch(question_branch): # pragma: no cover
+def is_question_branch(question_branch):
     """Validates the specified question branch.
 
     A branch is either a non-empty string which is a valid question or reserved key,
@@ -226,5 +226,5 @@ def is_question_branch(question_branch): # pragma: no cover
     raise NotImplementedError()
 
 
-def is_question_input(question_input, languages=None): # pragma: no cover
+def is_question_input(question_input, languages=None):
     raise NotImplementedError()
