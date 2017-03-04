@@ -72,6 +72,22 @@ class TestQuestionValidators(unittest.TestCase):
         self.assertFalse(validator.is_reserved_question_key("*$/\\")[0], "Unaccepted characters")
         self.assertFalse(validator.is_reserved_question_key("\n")[0], "Illegal escape character")
 
+    def test_valid_question_titles(self):
+        self.assertTrue(validator.is_question_title("Is this a question title?")[0], "Simple title")
+        self.assertTrue(validator.is_question_title({"en":"Is this a normalized title?"})[0], "Normalized title")
+
+    def test_illegal_question_titles(self):
+        self.assertRaises(TypeError, validator.is_question_title, None)
+        self.assertRaises(TypeError, validator.is_question_title, 42)
+        self.assertRaises(TypeError, validator.is_question_title, [])
+        self.assertRaises(TypeError, validator.is_question_title, {"la":"Et tu, Brute?"}, 42)
+        self.assertRaises(TypeError, validator.is_question_title, {"la":"Et tu, Brute?"}, {})
+        self.assertFalse(validator.is_question_title({"en":None})[0], "No normalized title")
+        self.assertFalse(validator.is_question_title({"en":""})[0], "Empty normalized title")
+        self.assertFalse(validator.is_question_title({"en":"     "})[0], "Whitespace only")
+        self.assertFalse(validator.is_question_title({42:"This is an invalid title."})[0], "Normalized title with illegal language code")
+        self.assertFalse(validator.is_question_title({"fr-Latin":"Ceci est un rappel."})[0], "Normalized title with illegal language code")
+
     def test_valid_questions(self):
         pass
 
