@@ -129,6 +129,7 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertTrue(helper.is_normalized_string({"en":"???"}), "Normalized string (syntactically)")
         self.assertTrue(helper.is_normalized_string({"fr-CH":"Mais où est donc Ornicar?"}), "Normalized swiss-french string")
         self.assertTrue(helper.is_normalized_string({"en":"What is the answer to life?", "fr":"Mais où est donc Ornicar?"}), "Normalized string with multiple languages")
+        self.assertTrue(helper.is_normalized_string({"en":"???", "fr":"???"}, []), "Normalized string with an empty list of required languages")
         self.assertTrue(helper.is_normalized_string({"en":"???", "fr":"???"}, ["en"]), "Normalized string with required language")
         self.assertTrue(helper.is_normalized_string({"en":"???", "fr":"???"}, ["en", "fr"]), "Normalized string with multiple required languages")
 
@@ -146,3 +147,4 @@ class TestHelperFunctions(unittest.TestCase):
         self.assertFalse(helper.is_normalized_string({"en 12":"What is your name?"}), "Invalid language code")
         self.assertFalse(helper.is_normalized_string({"en":"What is your name?", "fr":""}), "Missing question")
         self.assertFalse(helper.is_normalized_string({"en":"What is your name?"}, ["fr"]), "Missing a required language")
+        self.assertFalse(helper.is_normalized_string({"en":"???", "fr":"???"}, [1, 2, 3]), "Illegal required language codes")
