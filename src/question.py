@@ -227,4 +227,54 @@ def is_question_branch(question_branch):
 
 
 def is_question_input(question_input, languages=None):
-    raise NotImplementedError()
+    """Validates the specified input configuration.
+
+    A question's input configuration is a non-empty dictionary comprised of different fields
+    that define a question's input parameters.
+
+    Args:
+        question_input (dict): An input configuration to validate.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the specified configuration
+            is valid, False otherwise; as well as an error message in case it is invalid.
+
+    Raises:
+        TypeError: If the question_input argument is not a dictionary, or if languages
+            is not a list or NoneType.
+    """
+    if not isinstance(question_input, dict):
+        raise TypeError("Invalid argument type: is_question_input expects 'dict' for the question_input argument but got '{}'.".format(type(question_input).__name__))
+    elif languages is not None and not isinstance(languages, list):
+        raise TypeError("Invalid argument type: is_question_input expects 'list' or 'NoneType' for the languages argument but got '{}'.".format(type(languages).__name__))
+
+    missing = [k for k in is_question_input.REQUIRED_FIELDS if k not in question_input or question_input[k] is None]
+    if missing:
+        message = "The question input configuration is missing the following fields: '{}'."
+        return (False, message.format("', '".join(missing)))
+
+    input_type = question_input["type"]
+    validator = is_question_input.VALIDATORS.get(input_type)
+    if not validator:
+        return (False, "The question input type '{}' is not recognized.".format(input_type))
+
+    return validator(question_input, languages)
+
+
+is_question_input.REQUIRED_FIELDS = frozenset([
+    "type",
+])
+"""A collection of required question input fields."""
+
+
+is_question_input.VALIDATORS = {
+    "polar": lambda x, y: (True, None),
+    "dropdown-list": lambda x, y: (True, None),
+    "multiple-choice": lambda x, y: (True, None),
+    "text": lambda x, y: (True, None),
+    "number": lambda x, y: (True, None),
+    "datetime": lambda x, y: (True, None),
+    "url": lambda x, y: (True, None),
+    "geotagging": lambda x, y: (True, None),
+}
+"""A collection of question input validators."""

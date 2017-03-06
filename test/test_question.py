@@ -121,7 +121,13 @@ class TestQuestionValidators(unittest.TestCase):
         self.assertRaises(NotImplementedError, validator.is_question_branch, None)
 
     def test_valid_question_input(self):
-        self.assertRaises(NotImplementedError, validator.is_question_input, None)
+        pass
 
     def test_illegal_question_input(self):
-        self.assertRaises(NotImplementedError, validator.is_question_input, None)
+        self.assertRaises(TypeError, validator.is_question_input, None)
+        self.assertRaises(TypeError, validator.is_question_input, 42)
+        self.assertRaises(TypeError, validator.is_question_input, "")
+        self.assertRaises(TypeError, validator.is_question_input, [])
+        self.assertRaises(TypeError, validator.is_question_input, {}, 42)
+        self.assertRaises(TypeError, validator.is_question_input, {}, "")
+        self.assertRaises(TypeError, validator.is_question_input, {}, {})
