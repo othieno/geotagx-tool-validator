@@ -46,7 +46,7 @@ def is_project_configuration(configuration, enable_logging=False):
     elif not isinstance(enable_logging, bool):
         raise TypeError("Invalid argument type: is_project_configuration expects 'bool' for the enable_logging argument but got '{}'.".format(type(enable_logging).__name__))
 
-    missing = [k for k in ["name", "short_name", "description"] if k not in configuration]
+    missing = [k for k in is_project_configuration.REQUIRED_FIELDS if k not in configuration]
     if missing:
         return (False, "The project configuration is missing the following fields: '{}'.".format("', '".join(missing)))
 
@@ -67,6 +67,14 @@ def is_project_configuration(configuration, enable_logging=False):
             return (False, message)
 
     return (True, None)
+
+
+is_project_configuration.REQUIRED_FIELDS = frozenset([
+    "name",
+    "short_name",
+    "description",
+])
+"""A set of required project configuration fields."""
 
 
 def is_project_name(name):
