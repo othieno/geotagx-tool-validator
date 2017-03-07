@@ -131,3 +131,22 @@ class TestQuestionValidators(unittest.TestCase):
         self.assertRaises(TypeError, validator.is_question_input, {}, 42)
         self.assertRaises(TypeError, validator.is_question_input, {}, "")
         self.assertRaises(TypeError, validator.is_question_input, {}, {})
+
+    def test_valid_question_input_types(self):
+        self.assertTrue(validator.is_question_input_type("polar"), "Polar (Yes/No) input")
+        self.assertTrue(validator.is_question_input_type("dropdown-list"), "Dropdown list input")
+        self.assertTrue(validator.is_question_input_type("multiple-choice"), "Multiple-choice input")
+        self.assertTrue(validator.is_question_input_type("text"), "Text input")
+        self.assertTrue(validator.is_question_input_type("number"), "Number input")
+        self.assertTrue(validator.is_question_input_type("datetime"), "Date and time input")
+        self.assertTrue(validator.is_question_input_type("url"), "URL input")
+        self.assertTrue(validator.is_question_input_type("geotagging"), "Geotagging input")
+
+    def test_illegal_question_input_types(self):
+        self.assertRaises(TypeError, validator.is_question_input_type, None)
+        self.assertRaises(TypeError, validator.is_question_input_type, 42)
+        self.assertRaises(TypeError, validator.is_question_input_type, [])
+        self.assertRaises(TypeError, validator.is_question_input_type, {})
+        self.assertFalse(validator.is_question_input_type("")[0], "Empty string")
+        self.assertFalse(validator.is_question_input_type("audio")[0], "Unrecognized type")
+        self.assertFalse(validator.is_question_input_type("dattetime")[0], "Typo for the date/time input")

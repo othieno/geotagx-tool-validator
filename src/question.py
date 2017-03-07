@@ -254,6 +254,11 @@ def is_question_input(question_input, languages=None):
         return (False, message.format("', '".join(missing)))
 
     input_type = question_input["type"]
+    valid, message = is_question_input_type(input_type)
+    if not valid:
+        return (False, message)
+
+    # Note: the VALIDATORS dictionary is defined at the end of this module.
     validator = is_question_input.VALIDATORS.get(input_type)
     if not validator:
         return (False, "The question input type '{}' is not recognized.".format(input_type))
@@ -265,6 +270,40 @@ is_question_input.REQUIRED_FIELDS = frozenset([
     "type",
 ])
 """A collection of required question input fields."""
+
+
+def is_question_input_type(input_type):
+    """Validates the specified question input type.
+
+    Args:
+        input_type (str): An input type to validate.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the specified input type
+            is valid, False otherwise; as well as an error message in case it is invalid.
+
+    Raises:
+        TypeError: If the input_type argument is not a string.
+    """
+    if is_empty_string(input_type):
+        return (False, "An input type must be a non-empty string.")
+    elif input_type not in is_question_input_type.INPUT_TYPES:
+        return (False, "The input type '{}' is not recognized.".format(input_type))
+
+    return (True, None)
+
+
+is_question_input_type.INPUT_TYPES = frozenset([
+    "polar",
+    "dropdown-list",
+    "multiple-choice",
+    "text",
+    "number",
+    "datetime",
+    "url",
+    "geotagging",
+])
+"""A collection of question input types."""
 
 
 is_question_input.VALIDATORS = {
