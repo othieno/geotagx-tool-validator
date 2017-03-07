@@ -131,6 +131,13 @@ class TestQuestionValidators(unittest.TestCase):
         self.assertRaises(TypeError, validator.is_question_input, {}, 42)
         self.assertRaises(TypeError, validator.is_question_input, {}, "")
         self.assertRaises(TypeError, validator.is_question_input, {}, {})
+        self.assertRaises(TypeError, validator.is_question_input, {"type": 42})
+        self.assertRaises(TypeError, validator.is_question_input, {"type": []})
+        self.assertRaises(TypeError, validator.is_question_input, {"type": {}})
+        self.assertFalse(validator.is_question_input({})[0], "Empty dictionary")
+        self.assertFalse(validator.is_question_input({"type": None})[0], "Undefined input type")
+        self.assertFalse(validator.is_question_input({"type": ""})[0], "Empty input type")
+        self.assertFalse(validator.is_question_input({"type": "xyz"})[0], "Unrecognized input type")
 
     def test_valid_question_input_types(self):
         self.assertTrue(validator.is_question_input_type("polar"), "Polar (Yes/No) input")
