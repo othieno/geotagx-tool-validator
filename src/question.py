@@ -306,7 +306,7 @@ is_question_input_type.INPUT_TYPES = frozenset([
 """A collection of question input types."""
 
 
-def __is_polar_input(question_input, unused=None): # pragma: no cover
+def __is_polar_input(question_input, unused=None):
     """Validates the specified polar input configuration.
 
     A polar input configuration is a non-empty dictionary that contains the 'type' field.
@@ -322,14 +322,42 @@ def __is_polar_input(question_input, unused=None): # pragma: no cover
     return (True, None)
 
 
+def __is_dropdown_list_input(question_input, languages=None):
+    raise NotImplementedError()
+
+
+def __is_multiple_choice_input(question_input, languages=None):
+    raise NotImplementedError()
+
+
+def __is_text_input(question_input, languages=None):
+    raise NotImplementedError()
+
+
+def __is_number_input(question_input, languages=None):
+    raise NotImplementedError()
+
+
+def __is_datetime_input(question_input, languages=None):
+    raise NotImplementedError()
+
+
+def __is_url_input(question_input, languages=None):
+    raise NotImplementedError()
+
+
+def __is_geotagging_input(question_input, languages=None):
+    raise NotImplementedError()
+
+
 is_question_input.VALIDATORS = {
     "polar": __is_polar_input,
-    "dropdown-list": lambda x, y: (True, None),
-    "multiple-choice": lambda x, y: (True, None),
-    "text": lambda x, y: (True, None),
-    "number": lambda x, y: (True, None),
-    "datetime": lambda x, y: (True, None),
-    "url": lambda x, y: (True, None),
-    "geotagging": lambda x, y: (True, None),
+    "dropdown-list": __is_dropdown_list_input,
+    "multiple-choice": __is_multiple_choice_input,
+    "text": __is_text_input,
+    "number": __is_number_input,
+    "datetime": __is_datetime_input,
+    "url": __is_url_input,
+    "geotagging": __is_geotagging_input,
 }
 """A collection of question input validators."""

@@ -150,3 +150,48 @@ class TestQuestionValidators(unittest.TestCase):
         self.assertFalse(validator.is_question_input_type("")[0], "Empty string")
         self.assertFalse(validator.is_question_input_type("audio")[0], "Unrecognized type")
         self.assertFalse(validator.is_question_input_type("dattetime")[0], "Typo for the date/time input")
+
+    def test_valid_polar_inputs(self):
+        self.assertTrue(validator.is_question_input({"type": "polar"})[0], "Polar input")
+
+    def test_valid_dropdown_list_inputs(self):
+        self.assertRaises(NotImplementedError, validator.is_question_input, {"type": "dropdown-list"})
+
+    def test_illegal_dropdown_list_inputs(self):
+        pass
+
+    def test_valid_multiple_choice_inputs(self):
+        self.assertRaises(NotImplementedError, validator.is_question_input, {"type": "multiple-choice"})
+
+    def test_illegal_multiple_choice_inputs(self):
+        pass
+
+    def test_valid_text_inputs(self):
+        self.assertRaises(NotImplementedError, validator.is_question_input, {"type": "text"})
+
+    def test_illegal_text_inputs(self):
+        pass
+
+    def test_valid_number_inputs(self):
+        self.assertRaises(NotImplementedError, validator.is_question_input, {"type": "number"})
+
+    def test_illegal_number_inputs(self):
+        pass
+
+    def test_valid_datetime_inputs(self):
+        self.assertRaises(NotImplementedError, validator.is_question_input, {"type": "datetime"})
+
+    def test_illegal_datetime_inputs(self):
+        pass
+
+    def test_valid_url_inputs(self):
+        self.assertRaises(NotImplementedError, validator.is_question_input, {"type": "url"})
+
+    def test_illegal_url_inputs(self):
+        pass
+
+    def test_valid_geotagging_inputs(self):
+        self.assertRaises(NotImplementedError, validator.is_question_input, {"type": "geotagging"})
+
+    def test_illegal_geotagging_inputs(self):
+        pass
