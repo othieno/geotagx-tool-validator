@@ -306,8 +306,24 @@ is_question_input_type.INPUT_TYPES = frozenset([
 """A collection of question input types."""
 
 
+def __is_polar_input(question_input, unused=None): # pragma: no cover
+    """Validates the specified polar input configuration.
+
+    A polar input configuration is a non-empty dictionary that contains the 'type' field.
+    Since the type field is validated prior to this function being called (see
+    is_question_input), this function always returns True.
+
+    Args:
+        question_input (dict): A polar input configuration to validate.
+
+    Returns:
+        <True, None>: A pair containing the value True, and no error message.
+    """
+    return (True, None)
+
+
 is_question_input.VALIDATORS = {
-    "polar": lambda x, y: (True, None),
+    "polar": __is_polar_input,
     "dropdown-list": lambda x, y: (True, None),
     "multiple-choice": lambda x, y: (True, None),
     "text": lambda x, y: (True, None),
