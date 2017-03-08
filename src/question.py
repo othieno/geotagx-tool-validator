@@ -238,7 +238,19 @@ def is_question_branch(question_branch):
     Raises:
         TypeError: If the question_branch argument is not a string or dictionary.
     """
-    raise NotImplementedError()
+    if isinstance(question_branch, basestring):
+        if not __is_key(question_branch):
+            return (False, "A question branch string must be a valid key, reserved or otherwise.")
+    elif isinstance(question_branch, dict):
+        if question_branch:
+            if any(not __is_key(key) for key in question_branch.itervalues()):
+                return (False, "A question branch string must be a valid key, reserved or otherwise.")
+        else:
+            return (False, "A question branch dictionary must contain at least one answer-key pair.")
+    else:
+        raise TypeError("Invalid argument type: is_question_branch expects 'basestring' or 'dict' for the question_branch argument but got '{}'.".format(type(question_branch).__name__))
+
+    return (True, None)
 
 
 def is_question_input_type(input_type):

@@ -115,10 +115,20 @@ class TestQuestionValidators(unittest.TestCase):
         self.assertFalse(validator.is_question_help({"fr-Latin":"Ceci est un rappel."})[0], "Normalized hint with illegal language code")
 
     def test_valid_question_branches(self):
-        self.assertRaises(NotImplementedError, validator.is_question_branch, None)
+        self.assertTrue(validator.is_question_branch("start")[0], "Question key")
+        self.assertTrue(validator.is_question_branch("_stop")[0], "Reserved question key")
+        self.assertTrue(validator.is_question_branch({
+            "no":"start",
+            "yes":"stop",
+            "okay":"_on",
+        })[0], "Multiple branch nodes")
 
     def test_illegal_question_branches(self):
-        self.assertRaises(NotImplementedError, validator.is_question_branch, None)
+        self.assertRaises(TypeError, validator.is_question_branch, None)
+        self.assertRaises(TypeError, validator.is_question_branch, 42)
+        self.assertRaises(TypeError, validator.is_question_branch, [])
+        self.assertFalse(validator.is_question_branch("")[0], "Empty string")
+        self.assertFalse(validator.is_question_branch({})[0], "Empty dictionary")
 
     def test_valid_question_input(self):
         pass
