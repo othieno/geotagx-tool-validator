@@ -306,12 +306,12 @@ is_question_input_type.INPUT_TYPES = frozenset([
 """A collection of question input types."""
 
 
-def __is_polar_input(question_input, unused=None):
+def __is_polar_input(question_input, _):
     """Validates the specified polar input configuration.
 
     A polar input configuration is a non-empty dictionary that contains the 'type' field.
     Since the type field is validated prior to this function being called (see
-    is_question_input), this function always returns True.
+    is_question_input), this function always returns <True, None>.
 
     Args:
         question_input (dict): A polar input configuration to validate.
@@ -346,8 +346,28 @@ def __is_url_input(question_input, languages=None):
     raise NotImplementedError()
 
 
-def __is_geotagging_input(question_input, languages=None):
-    raise NotImplementedError()
+def __is_geotagging_input(question_input, _):
+    """Validates the specified geotagging input configuration.
+
+    A geotagging input configuration contains the following optional fields:
+    - location: a string that specifies the input's initial location.
+
+    Args:
+        question_input (dict): A geotagging input configuration to validate.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the specified configuration
+            is valid, False otherwise; as well as an error message in case it is invalid.
+    """
+    if "location" in question_input and question_input["location"] is not None:
+        message = "A geotagging input's 'location' field must be a non-empty string."
+        try:
+            if is_empty_string(question_input["location"]):
+                return (False, message)
+        except TypeError:
+            return (False, message)
+
+    return (True, None)
 
 
 is_question_input.VALIDATORS = {

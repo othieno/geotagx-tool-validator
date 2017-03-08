@@ -198,7 +198,30 @@ class TestQuestionValidators(unittest.TestCase):
         pass
 
     def test_valid_geotagging_inputs(self):
-        self.assertRaises(NotImplementedError, validator.is_question_input, {"type": "geotagging"})
+        self.assertTrue(validator.is_question_input({"type": "geotagging"})[0], "Geotagging input")
+        self.assertTrue(validator.is_question_input({
+            "type": "geotagging",
+            "location": None
+        })[0], "Geotagging input with explicitly unspecified location")
+        self.assertTrue(validator.is_question_input({
+            "type": "geotagging",
+            "location": "Geneva"
+        })[0], "Geotagging input with location")
 
     def test_illegal_geotagging_inputs(self):
-        pass
+        self.assertFalse(validator.is_question_input({
+            "type": "geotagging",
+            "location": ""
+        })[0], "Geotagging input with empty location value")
+        self.assertFalse(validator.is_question_input({
+            "type": "geotagging",
+            "location": 42
+        })[0], "Geotagging input with invalid location value type (numerical value)")
+        self.assertFalse(validator.is_question_input({
+            "type": "geotagging",
+            "location": ["Geneva"]
+        })[0], "Geotagging input with invalid location value type (list)")
+        self.assertFalse(validator.is_question_input({
+            "type": "geotagging",
+            "location": {}
+        })[0], "Geotagging input with invalid location value type (dictionary)")
