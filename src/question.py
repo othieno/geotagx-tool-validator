@@ -90,6 +90,29 @@ is_question.REQUIRED_FIELDS = frozenset([
 """A set of required question fields."""
 
 
+def __is_key(key):
+    """Validates the specified key.
+
+    A key is a non-empty string that is strictly composed of alphanumeric
+    characters (a-Z, A-Z, 0-9), hyphens (-) or underscores (_).
+
+    Args:
+        key (str): A key to validate.
+
+    Returns:
+        bool: True if the specified key is valid, False otherwise.
+
+    Raises:
+        TypeError: If the key argument is not a string.
+    """
+    if is_empty_string(key):
+        return False
+    else:
+        from re import match
+        matches = match("[a-zA-Z0-9-_]+", key)
+        return matches and matches.group() == key
+
+
 def is_question_key(key):
     """Validates the specified question key.
 
@@ -107,14 +130,10 @@ def is_question_key(key):
     Raises:
         TypeError: If the key argument is not a string.
     """
-    message = "A question key must be a non-empty string strictly composed of alphanumeric characters (a-z, A-Z, 0-9), hyphens (-) or underscores (_). It must never begin with an underscore."
-    if is_empty_string(key):
-        return (False, message)
-    else:
-        from re import match
-        matches = match("(?!_)[a-zA-Z0-9-_]+", key)
-        valid = matches and matches.group() == key
-        return (True, None) if valid else (False, message)
+    if not __is_key(key) or key[0] == '_':
+        return (False, "A question key must be a non-empty string strictly composed of alphanumeric characters (a-z, A-Z, 0-9), hyphens (-) or underscores (_). It must never begin with an underscore.")
+
+    return (True, None)
 
 
 def is_reserved_question_key(key):
@@ -135,14 +154,10 @@ def is_reserved_question_key(key):
     Raises:
         TypeError: If the key argument is not a string.
     """
-    message = "A reserved key must be a non-empty string strictly composed of alphanumeric characters (a-z, A-Z, 0-9), hyphens (-) or underscores (_). It must always begin with an underscore."
-    if is_empty_string(key):
-        return (False, message)
-    else:
-        from re import match
-        matches = match("_+[a-zA-Z0-9-_]+", key)
-        valid = matches and matches.group() == key
-        return (True, None) if valid else (False, message)
+    if not __is_key(key) or key[0] != '_':
+        return (False, "A reserved key must be a non-empty string strictly composed of alphanumeric characters (a-z, A-Z, 0-9), hyphens (-) or underscores (_). It must always begin with an underscore.")
+
+    return (True, None)
 
 
 def is_question_title(question_title, languages=None):
