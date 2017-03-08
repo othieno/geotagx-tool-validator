@@ -136,20 +136,20 @@ def is_question_key(key):
     return (True, None)
 
 
-def is_reserved_question_key(key):
+def is_reserved_key(key):
     """Validates the specified reserved question key.
 
     A key is a non-empty string that is strictly composed of alphanumeric
-    characters (a-Z, A-Z, 0-9), hyphens (-) or underscores (_). A reserved key
-    is almost identical to a regular question key with one slight difference: it
-    must always begin with an underscore.
+    characters (a-Z, A-Z, 0-9), hyphens (-) or underscores (_). A key reserved for
+    internal use is almost identical to a regular question key with one slight
+    difference: it must always begin with an underscore.
 
     Args:
         key (str): A reserved key to validate.
 
     Returns:
-        bool: True if the specified key is valid and reserved for internal use,
-        False otherwise.
+        <bool, str|None>: A pair containing the value True if the specified key is valid,
+            False otherwise; as well as an error message in case validation fails.
 
     Raises:
         TypeError: If the key argument is not a string.
