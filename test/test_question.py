@@ -30,14 +30,44 @@ import question as validator
 
 class TestQuestionValidators(unittest.TestCase):
     def test_valid_questions(self):
-        pass
+        self.assertTrue(validator.is_question({
+            "key": "ready",
+            "title": "Are you ready?",
+            "input": {
+                "type": "polar"
+            },
+        })[0], "Simple question configuration")
 
     def test_illegal_questions(self):
         self.assertRaises(TypeError, validator.is_question, None)
         self.assertRaises(TypeError, validator.is_question, 42)
         self.assertRaises(TypeError, validator.is_question, [])
         self.assertRaises(TypeError, validator.is_question, "")
-        self.assertFalse(validator.is_question({})[0], "Empty dict")
+        self.assertFalse(validator.is_question({})[0], "Empty dictionary")
+        self.assertFalse(validator.is_question({
+            "key": "ready",
+            "title": "Are you ready?",
+            "input": {
+                "type": "polar"
+            },
+            "hintr": "This field's key has a typo!",
+        })[0], "Unrecognized field")
+        self.assertFalse(validator.is_question({
+            "title": "Are you ready?",
+            "input": {
+                "type": "polar"
+            },
+        })[0], "Missing key field")
+        self.assertFalse(validator.is_question({
+            "key": "ready",
+            "input": {
+                "type": "polar"
+            },
+        })[0], "Missing title field")
+        self.assertFalse(validator.is_question({
+            "key": "ready",
+            "title": "Are you ready?",
+        })[0], "Missing input field")
 
     def test_valid_question_keys(self):
         self.assertTrue(validator.is_question_key("A")[0], "Single-character")
@@ -85,6 +115,10 @@ class TestQuestionValidators(unittest.TestCase):
     def test_valid_question_titles(self):
         self.assertTrue(validator.is_question_title("Is this a question title?")[0], "Simple title")
         self.assertTrue(validator.is_question_title({"en":"Is this a normalized title?"})[0], "Normalized title")
+        self.assertTrue(validator.is_question_title({
+            "en":"Is this a normalized title?",
+            "fr":"Est-ce un titre normalisé?",
+        })[0], "Normalized title with translation")
 
     def test_illegal_question_titles(self):
         self.assertRaises(TypeError, validator.is_question_title, None)
