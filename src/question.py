@@ -281,7 +281,7 @@ def __is_polar_input(question_input, _):
     is_question_input), this function always returns <True, None>.
 
     Args:
-        question_input (dict): A polar input configuration to validate.
+        question_input (dict): An input configuration to validate.
 
     Returns:
         <True, None>: A pair containing the value True, and no error message.
@@ -298,7 +298,62 @@ def __is_multiple_choice_input(question_input, languages=None):
 
 
 def __is_text_input(question_input, languages=None):
-    raise NotImplementedError()
+    """Validates the specified text input configuration.
+
+    Args:
+        question_input (dict): An input configuration to validate.
+        languages (list): A list of languages that the normalized string dictionary must contain,
+            where each item of the list is a language code.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the specified configuration
+            is valid, False otherwise; as well as an error message in case it is invalid.
+    """
+    unrecognized = [k for k in question_input.keys() if k != "type" and k not in __is_text_input.FIELDS]
+    if unrecognized:
+        message = "The text input configuration contains the following unrecognized keys: '{}'."
+        return (False, message.format("', '".join(unrecognized)))
+
+    placeholder = question_input.get("placeholder")
+    if placeholder is not None:
+        error = (False, "A placeholder must be a non-empty or normalized string.")
+        try:
+            if not is_configuration_string(placeholder, languages):
+                return error
+        except TypeError:
+            return error
+
+    enable_long_text = question_input.get("enable-long-text")
+    if enable_long_text is not None:
+        if not isinstance(enable_long_text, bool):
+            return (False, "The 'enable-long-text' field must be a boolean value.")
+
+    min_length = question_input.get("min-length")
+    if min_length is not None:
+        if not isinstance(min_length, int):
+            return (False, "The 'min-length' field must be an integer value.")
+        elif min_length < 0:
+            return (False, "The 'min-length' must be a positive integer.")
+
+    max_length = question_input.get("max-length")
+    if max_length is not None:
+        if not isinstance(max_length, int):
+            return (False, "The 'max-length' field must be an integer value.")
+        elif max_length < 0:
+            return (False, "The 'min-length' must be a positive integer.")
+        elif min_length is not None and max_length < min_length:
+            return (False, "The 'max-length' must be greater than or equal to the 'min-length'.")
+
+    return (True, None)
+
+
+__is_text_input.FIELDS = frozenset([
+    "placeholder",
+    "enable-long-text",
+    "min-length",
+    "max-length",
+])
+"""A collection of text input configuration fields."""
 
 
 def __is_number_input(question_input, languages=None):
@@ -320,7 +375,7 @@ def __is_geotagging_input(question_input, _):
     - location: a string that specifies the input's initial location.
 
     Args:
-        question_input (dict): A geotagging input configuration to validate.
+        question_input (dict): An input configuration to validate.
 
     Returns:
         <bool, str|None>: A pair containing the value True if the specified configuration

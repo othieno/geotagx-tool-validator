@@ -218,10 +218,37 @@ class TestQuestionValidators(unittest.TestCase):
         pass
 
     def test_valid_text_inputs(self):
-        self.assertRaises(NotImplementedError, validator.is_question_input, {"type": "text"})
+        self.assertTrue(validator.is_question_input({"type": "text"})[0], "Text input")
+        self.assertTrue(validator.is_question_input({
+            "type": "text",
+            "placeholder": "Please enter your name.",
+            "enable-long-text": True,
+            "min-length": 32,
+            "max-length": 64,
+        })[0], "Full text input")
 
     def test_illegal_text_inputs(self):
-        pass
+        self.assertFalse(validator.is_question_input({
+            "type": "text",
+            "enable_long_text": True,
+        })[0], "Unrecognized field")
+        self.assertFalse(validator.is_question_input({
+            "type": "text",
+            "enable-long-text": 1,
+        })[0], "Enable long text field is not a boolean")
+        self.assertFalse(validator.is_question_input({
+            "type": "text",
+            "min-length": 64,
+            "max-length": 32,
+        })[0], "Maximum length less than the minimum length")
+        self.assertFalse(validator.is_question_input({
+            "type": "text",
+            "min-length": -32,
+        })[0], "Minimum length is negative")
+        self.assertFalse(validator.is_question_input({
+            "type": "text",
+            "max-length": -32,
+        })[0], "Maximum length is negative")
 
     def test_valid_number_inputs(self):
         self.assertRaises(NotImplementedError, validator.is_question_input, {"type": "number"})
