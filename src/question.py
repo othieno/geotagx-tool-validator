@@ -273,6 +273,28 @@ is_question_input_type.INPUT_TYPES = frozenset([
 """A collection of question input types."""
 
 
+def __find_unexpected_keys(dictionary, expected_keys):
+    """Returns a list of keys that are not expected to be in the specified dictionary.
+
+    Args:
+        dictionary (dict): A dictionary containing keys to check.
+        expected_keys (frozenset): A set of keys expected to be in the specified dictionary.
+
+    Returns:
+        list: A list of keys that are not expected to be in the specified dictionary.
+
+    Raises:
+        TypeError: If the dictionary argument is not a dict, or the expected_keys
+            argument is not a frozenset.
+    """
+    if not isinstance(dictionary, dict):
+        raise TypeError("Invalid argument type: __find_unexpected_keys expects 'dict' for dictionary argument but got '{}'.".format(type(dictionary).__name__))
+    elif not isinstance(expected_keys, frozenset):
+        raise TypeError("Invalid argument type: __find_unexpected_keys expects 'frozenset' for expected_keys argument but got '{}'.".format(type(expected_keys).__name__))
+
+    return [k for k in dictionary.keys() if k not in expected_keys]
+
+
 def __is_polar_input(question_input, _):
     """Validates the specified polar input configuration.
 
@@ -286,7 +308,18 @@ def __is_polar_input(question_input, _):
     Returns:
         <True, None>: A pair containing the value True, and no error message.
     """
+    unexpected_keys = __find_unexpected_keys(question_input, __is_polar_input.FIELDS)
+    if unexpected_keys:
+        message = "The polar input configuration contains the following unrecognized fields: '{}'."
+        return (False, message.format("', '".join(unexpected_keys)))
+
     return (True, None)
+
+
+__is_polar_input.FIELDS = frozenset([
+    "type",
+])
+"""A collection of polar input configuration fields."""
 
 
 def __is_dropdown_list_input(question_input, languages=None):
@@ -309,10 +342,10 @@ def __is_text_input(question_input, languages=None):
         <bool, str|None>: A pair containing the value True if the specified configuration
             is valid, False otherwise; as well as an error message in case it is invalid.
     """
-    unrecognized = [k for k in question_input.keys() if k != "type" and k not in __is_text_input.FIELDS]
-    if unrecognized:
-        message = "The text input configuration contains the following unrecognized keys: '{}'."
-        return (False, message.format("', '".join(unrecognized)))
+    unexpected_keys = __find_unexpected_keys(question_input, __is_text_input.FIELDS)
+    if unexpected_keys:
+        message = "The text input configuration contains the following unrecognized fields: '{}'."
+        return (False, message.format("', '".join(unexpected_keys)))
 
     placeholder = question_input.get("placeholder")
     if placeholder is not None:
@@ -348,6 +381,7 @@ def __is_text_input(question_input, languages=None):
 
 
 __is_text_input.FIELDS = frozenset([
+    "type",
     "placeholder",
     "enable-long-text",
     "min-length",
@@ -381,6 +415,11 @@ def __is_geotagging_input(question_input, _):
         <bool, str|None>: A pair containing the value True if the specified configuration
             is valid, False otherwise; as well as an error message in case it is invalid.
     """
+    unexpected_keys = __find_unexpected_keys(question_input, __is_geotagging_input.FIELDS)
+    if unexpected_keys:
+        message = "The geotagging input configuration contains the following unrecognized fields: '{}'."
+        return (False, message.format("', '".join(unexpected_keys)))
+
     location = question_input.get("location")
     if location is not None:
         message = "A geotagging input's 'location' field must be a non-empty string."
@@ -391,6 +430,13 @@ def __is_geotagging_input(question_input, _):
             return (False, message)
 
     return (True, None)
+
+
+__is_geotagging_input.FIELDS = frozenset([
+    "type",
+    "location",
+])
+"""A collection of geotagging input configuration fields."""
 
 
 def is_question_input(question_input, languages=None):
