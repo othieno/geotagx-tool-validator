@@ -65,10 +65,10 @@ def is_normalized_string(normalized_string, language_codes=None):
             not a list or a NoneType.
     """
     if not isinstance(normalized_string, dict):
-        raise TypeError("Invalid argument type: is_normalized_string expects 'dict' for normalized_string argument but got '%s'.".format(type(normalized_string).__name__))
+        raise TypeError("Invalid argument type: is_normalized_string expects 'dict' for normalized_string argument but got '{}'.".format(type(normalized_string).__name__))
 
     if language_codes is not None and not isinstance(language_codes, list):
-        raise TypeError("Invalid argument type: is_normalized_string expects 'list' for language_codes argument but got '%s'.".format(type(language_codes).__name__))
+        raise TypeError("Invalid argument type: is_normalized_string expects 'list' for language_codes argument but got '{}'.".format(type(language_codes).__name__))
 
     try:
         return normalized_string and \
@@ -79,6 +79,33 @@ def is_normalized_string(normalized_string, language_codes=None):
         # string. So if the argument is not a string, it stands to reason that it's not a
         # valid ISO code.
         return False
+
+
+def is_configuration_string(configuration_string, language_codes=None):
+    """Checks if the specified string is a configuration string.
+
+    A configuration string, for lack of a better term, is a non-empty string, or a
+    normalized string, usually used in GeoTag-X's project configurations.
+
+    Args:
+        configuration_string (basestring|dict): A string or dictionary to validate.
+        language_codes (list): A list of languages that the normalized string dictionary must
+            contain, where each item of the list is a language code. Note that this argument
+            is used if and only if the string argument a dictionary (i.e., a normalized string).
+
+    Returns:
+        bool: True if the specified configuration string is valid, False otherwise.
+
+    Raises:
+        TypeError: If the configuration_string argument is not a string or dictionary,
+            or if the language_codes argument is not a list or NoneType.
+    """
+    if isinstance(configuration_string, basestring):
+        return not is_empty_string(configuration_string)
+    elif isinstance(configuration_string, dict):
+        return is_normalized_string(configuration_string, language_codes)
+    else:
+        raise TypeError("Invalid argument type: is_configuration_string expects 'basestring' or 'dict' for configuration_string argument but got '{}'.".format(type(configuration_string).__name__))
 
 
 def is_url(url):

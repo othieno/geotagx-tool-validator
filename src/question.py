@@ -25,7 +25,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-from helper import is_empty_string, is_normalized_string
+from helper import is_empty_string, is_configuration_string
 
 def is_question(question, available_languages=None):
     """Validates the specified question configuration.
@@ -178,17 +178,10 @@ def is_question_title(question_title, languages=None):
         TypeError: If the question_title argument is not a string or dictionary, or if
             languages is not a list or NoneType.
     """
-    if isinstance(question_title, basestring):
-        message = "A question title must be a non-empty string."
-        return (False, message) if is_empty_string(question_title) else (True, None)
-    elif isinstance(question_title, dict):
-        if languages is not None and not isinstance(languages, list):
-            raise TypeError("Invalid argument type: is_question_title expects 'list' or 'NoneType' for the languages argument but got '{}'.".format(type(languages).__name__))
+    if not is_configuration_string(question_title, languages):
+        return (False, "A question title must be a non-empty or normalized string.")
 
-        message = "The question title is not a valid normalized string."
-        return (True, None) if is_normalized_string(question_title, languages) else (False, message)
-    else:
-        raise TypeError("Invalid argument type: is_question_title expects 'basestring' or 'dict' for the question_title argument but got '{}'.".format(type(question_title).__name__))
+    return (True, None)
 
 
 def is_question_help(question_help, languages=None):
@@ -209,17 +202,10 @@ def is_question_help(question_help, languages=None):
         TypeError: If the question_help argument is not a string or dictionary, or if
             languages is not a list or NoneType.
     """
-    if isinstance(question_help, basestring):
-        message = "A question help must be a non-empty string."
-        return (False, message) if is_empty_string(question_help) else (True, None)
-    elif isinstance(question_help, dict):
-        if languages is not None and not isinstance(languages, list):
-            raise TypeError("Invalid argument type: is_question_help expects 'list' or 'NoneType' for the languages argument but got '{}'.".format(type(languages).__name__))
+    if not is_configuration_string(question_help, languages):
+        return (False, "A question help field must be a non-empty or normalized string.")
 
-        message = "The question help is not a valid normalized string."
-        return (True, None) if is_normalized_string(question_help, languages) else (False, message)
-    else:
-        raise TypeError("Invalid argument type: is_question_help expects 'basestring' or 'dict' for the question_help argument but got '{}'.".format(type(question_help).__name__))
+    return (True, None)
 
 
 def is_question_branch(question_branch):
