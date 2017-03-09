@@ -340,10 +340,11 @@ def __is_geotagging_input(question_input, _):
         <bool, str|None>: A pair containing the value True if the specified configuration
             is valid, False otherwise; as well as an error message in case it is invalid.
     """
-    if "location" in question_input and question_input["location"] is not None:
+    location = question_input.get("location")
+    if location is not None:
         message = "A geotagging input's 'location' field must be a non-empty string."
         try:
-            if is_empty_string(question_input["location"]):
+            if is_empty_string(location):
                 return (False, message)
         except TypeError:
             return (False, message)
