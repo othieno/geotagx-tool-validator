@@ -263,7 +263,7 @@ def is_question_input_type(input_type):
 is_question_input_type.INPUT_TYPES = frozenset([
     "polar",
     "dropdown-list",
-    "multiple-choice",
+    "multiple-option",
     "text",
     "number",
     "datetime",
@@ -326,7 +326,7 @@ def __is_dropdown_list_input(question_input, languages=None):
     raise NotImplementedError()
 
 
-def __is_multiple_choice_input(question_input, languages=None):
+def __is_multiple_option_input(question_input, languages=None):
     raise NotImplementedError()
 
 
@@ -487,7 +487,7 @@ is_question_input.REQUIRED_FIELDS = frozenset([
 is_question_input.VALIDATORS = {
     "polar": __is_polar_input,
     "dropdown-list": __is_dropdown_list_input,
-    "multiple-choice": __is_multiple_choice_input,
+    "multiple-option": __is_multiple_option_input,
     "text": __is_text_input,
     "number": __is_number_input,
     "datetime": __is_datetime_input,

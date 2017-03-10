@@ -186,7 +186,7 @@ class TestQuestionValidators(unittest.TestCase):
     def test_valid_question_input_types(self):
         self.assertTrue(validator.is_question_input_type("polar"), "Polar (Yes/No) input")
         self.assertTrue(validator.is_question_input_type("dropdown-list"), "Dropdown list input")
-        self.assertTrue(validator.is_question_input_type("multiple-choice"), "Multiple-choice input")
+        self.assertTrue(validator.is_question_input_type("multiple-option"), "Multiple-option input")
         self.assertTrue(validator.is_question_input_type("text"), "Text input")
         self.assertTrue(validator.is_question_input_type("number"), "Number input")
         self.assertTrue(validator.is_question_input_type("datetime"), "Date and time input")
@@ -211,10 +211,10 @@ class TestQuestionValidators(unittest.TestCase):
     def test_illegal_dropdown_list_inputs(self):
         pass
 
-    def test_valid_multiple_choice_inputs(self):
-        self.assertRaises(NotImplementedError, validator.is_question_input, {"type": "multiple-choice"})
+    def test_valid_multiple_option_inputs(self):
+        self.assertRaises(NotImplementedError, validator.is_question_input, {"type": "multiple-option"})
 
-    def test_illegal_multiple_choice_inputs(self):
+    def test_illegal_multiple_option_inputs(self):
         pass
 
     def test_valid_text_inputs(self):
