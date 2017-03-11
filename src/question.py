@@ -327,7 +327,72 @@ def __is_dropdown_list_input(question_input, languages=None):
 
 
 def __is_multiple_option_input(question_input, languages=None):
-    raise NotImplementedError()
+    unexpected_keys = __find_unexpected_keys(question_input, __is_multiple_option_input.FIELDS)
+    if unexpected_keys:
+        message = "The multiple-option input configuration contains the following unrecognized fields: '{}'."
+        return (False, message.format("', '".join(unexpected_keys)))
+
+    for key in ["enable-multiple-choices", "enable-other-option", "enable-illustrations"]:
+        field = question_input.get(key)
+        if field is not None and not isinstance(field, bool):
+            return (False, "The '{}' field must be a boolean value.".format(key))
+
+    options = question_input.get("options")
+    if options is not None:
+        enable_illustrations = question_input.get("enable-illustrations", False)
+        if not isinstance(options, list) or len(options) < 1:
+            return (False, "The 'options' field must be a non-empty list.")
+        else:
+            for option in options:
+                label = option.get("label")
+                error = (False, "An option label must be a non-empty or normalized string.")
+                try:
+                    if label is None or not is_configuration_string(label, languages):
+                        return error
+                except TypeError:
+                    return error
+
+                value = option.get("value")
+                if value is None or not isinstance(value, basestring):
+                    return (False, "An option value must be a string.")
+
+                # If the 'enable-illustrations' flag is set to True, validate illustrations.
+                illustration = option.get("illustration") if enable_illustrations else None
+                if illustration is not None:
+                    missing = [k for k in illustration.keys() if k not in __is_multiple_option_input.ILLUSTRATION_FIELDS or illustration[k] is None]
+                    if missing:
+                        missing = "', '".join(missing)
+                        return (False, "The illustration is missing the following fields: '{}'.".format(missing))
+
+                    for key in __is_multiple_option_input.ILLUSTRATION_FIELDS:
+                        try:
+                            field = illustration.get(key)
+                            if is_empty_string(field):
+                                return (False, "An illustration's '{}' field must be a non-empty string.".format(key))
+                        except:
+                            return (False, "An illustration's '{}' field must be a string.".format(key))
+    else:
+        return (False, "The 'options' field must be a non-empty list.")
+
+    return (True, None)
+
+
+__is_multiple_option_input.FIELDS = frozenset([
+    "type",
+    "enable-multiple-choices",
+    "enable-other-option",
+    "enable-illustrations",
+    "options",
+])
+"""A collection of multiple-option input configuration fields."""
+
+
+__is_multiple_option_input.ILLUSTRATION_FIELDS = frozenset([
+    "image",
+    "page",
+    "attribution",
+])
+"""A collection of a multiple-option input configuration's illustration subfields."""
 
 
 def __is_text_input(question_input, languages=None):
@@ -357,9 +422,8 @@ def __is_text_input(question_input, languages=None):
             return error
 
     enable_long_text = question_input.get("enable-long-text")
-    if enable_long_text is not None:
-        if not isinstance(enable_long_text, bool):
-            return (False, "The 'enable-long-text' field must be a boolean value.")
+    if enable_long_text is not None and not isinstance(enable_long_text, bool):
+        return (False, "The 'enable-long-text' field must be a boolean value.")
 
     min_length = question_input.get("min-length")
     if min_length is not None:

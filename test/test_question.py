@@ -212,10 +212,64 @@ class TestQuestionValidators(unittest.TestCase):
         pass
 
     def test_valid_multiple_option_inputs(self):
-        self.assertRaises(NotImplementedError, validator.is_question_input, {"type": "multiple-option"})
+        self.assertTrue(validator.is_question_input({
+            "type": "multiple-option",
+            "options": [
+                {"label": "32", "value": "32"},
+                {"label": "64", "value": "64"},
+            ],
+        })[0], "Basic multiple-option input")
+        self.assertTrue(validator.is_question_input({
+            "type": "multiple-option",
+            "enable-multiple-choices": True,
+            "enable-illustrations": False,
+            "enable-other-option": True,
+            "options": [
+                {"label": "32", "value": "32"},
+                {"label": "64", "value": "64"},
+            ],
+        })[0], "Complete multiple-option input")
+        self.assertTrue(validator.is_question_input({
+            "type": "multiple-option",
+            "enable-illustrations": True,
+            "options": [{
+                "label": "32",
+                "value": "32",
+                "illustration": {
+                    "image": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Strawberries.jpg",
+                    "page": "https://commons.wikimedia.org/wiki/File%3AStrawberries.jpg",
+                    "attribution": "Brian Prechtel"
+                }
+            }],
+        })[0], "Multiple-option input with illustrations")
 
     def test_illegal_multiple_option_inputs(self):
-        pass
+        self.assertFalse(validator.is_question_input({"type": "multiple-option"})[0], "Missing options")
+        self.assertFalse(validator.is_question_input({
+            "type": "multiple-option",
+            "options": [],
+        })[0], "Empty list of options")
+        self.assertFalse(validator.is_question_input({
+            "type": "multiple-option",
+            "options": [{"label": "32"}],
+        })[0], "Missing option value")
+        self.assertFalse(validator.is_question_input({
+            "type": "multiple-option",
+            "options": [{"value": "32"}],
+        })[0], "Missing option label")
+        self.assertFalse(validator.is_question_input({
+            "type": "multiple-option",
+            "options": [{"label": 32, "value": "32"}],
+        })[0], "Option label is not a string")
+        self.assertFalse(validator.is_question_input({
+            "type": "multiple-option",
+            "options": [{"label": "32", "value": 32}],
+        })[0], "Option value is not a string")
+        self.assertFalse(validator.is_question_input({
+            "type": "multiple-option",
+            "options": [{"label": "32", "value": "32"}],
+            "illustration": "image.png",
+        })[0], "Unrecognized field")
 
     def test_valid_text_inputs(self):
         self.assertTrue(validator.is_question_input({"type": "text"})[0], "Text input")
