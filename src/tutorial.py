@@ -66,8 +66,6 @@ def is_tutorial_configuration(
     if missing:
         return (False, "The tutorial configuration is missing the following fields: '{}'.".format("', '".join(missing)))
 
-    # available_languages = task_presenter_configuration["language"]["available"] if "language" in task_presenter_configuration else None
-
     validators = {
         "enable-random-order": is_tutorial_enable_random_order,
         "default-message": is_tutorial_default_message,
@@ -92,7 +90,17 @@ is_tutorial_configuration.REQUIRED_FIELDS = frozenset([
 
 
 def is_tutorial_enable_random_order(enable_random_order):
-    raise NotImplementedError
+    """Validates the specified 'Enable random order' flag.
+
+    Args:
+        enable_random_order (bool): A flag to validate.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the specified flag
+            is valid, False otherwise; and an error message in case the flag is invalid.
+    """
+    error_message = "The 'enable-random-order' argument must be a boolean."
+    return (True, None) if isinstance(enable_random_order, bool) else (False, error_message)
 
 
 def is_tutorial_default_message(default_message):
