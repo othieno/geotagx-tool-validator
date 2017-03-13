@@ -26,7 +26,7 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 def is_tutorial_configuration(
-    configuration,
+    tutorial_configuration,
     task_presenter_configuration,
     enable_logging=False,
     validate_task_presenter_configuration=True
@@ -34,7 +34,7 @@ def is_tutorial_configuration(
     """Validates the specified tutorial configuration.
 
     Args:
-        configuration (dict): A tutorial configuration to validate.
+        tutorial_configuration (dict): A tutorial configuration to validate.
         task_presenter_configuration (dict): The task presenter configuration complemented by the tutorial configuration.
         enable_logging (bool): If set to True, the function will log the operations it performs.
         validate_task_presenter_configuration (bool): If set to True, the specified task presenter configuration is validated too.
@@ -44,10 +44,11 @@ def is_tutorial_configuration(
             is valid, False otherwise; and an error message in case the name is invalid.
 
     Raises:
-        TypeError: If either of the configuration arguments is not a dictionary, or the remaining arguments are not booleans.
+        TypeError: If either of the configuration arguments is not a dictionary, or the
+            remaining arguments are not booleans.
     """
-    if not isinstance(configuration, dict):
-        raise TypeError("Invalid argument type: is_tutorial_configuration expects 'dict' for the configuration argument but got '{}'.".format(type(configuration).__name__))
+    if not isinstance(tutorial_configuration, dict):
+        raise TypeError("Invalid argument type: is_tutorial_configuration expects 'dict' for the tutorial_configuration argument but got '{}'.".format(type(tutorial_configuration).__name__))
     elif not isinstance(task_presenter_configuration, dict):
         raise TypeError("Invalid argument type: is_tutorial_configuration expects 'dict' for the task_presenter_configuration argument but got '{}'.".format(type(task_presenter_configuration).__name__))
     elif not isinstance(enable_logging, bool):
@@ -55,4 +56,48 @@ def is_tutorial_configuration(
     elif not isinstance(validate_task_presenter_configuration, bool):
         raise TypeError("Invalid argument type: is_tutorial_configuration expects 'bool' for the validate_task_presenter_configuration argument but got '{}'.".format(type(validate_task_presenter_configuration).__name__))
 
-    raise NotImplementedError()
+    if validate_task_presenter_configuration:
+        from task_presenter import is_task_presenter_configuration
+        valid, message = is_task_presenter_configuration(task_presenter_configuration)
+        if not valid:
+            return (False, message)
+
+    missing = [k for k in is_tutorial_configuration.REQUIRED_FIELDS if k not in tutorial_configuration]
+    if missing:
+        return (False, "The tutorial configuration is missing the following fields: '{}'.".format("', '".join(missing)))
+
+    # available_languages = task_presenter_configuration["language"]["available"] if "language" in task_presenter_configuration else None
+
+    validators = {
+        "enable-random-order": is_tutorial_enable_random_order,
+        "default-message": is_tutorial_default_message,
+        "subjects": is_tutorial_subjects,
+    }
+    for key, configuration in tutorial_configuration.iteritems():
+        validator = validators.get(key)
+        if not validator:
+            return (False, "The tutorial configuration key '{}' is not recognized.".format(key))
+
+        valid, message = validator(configuration)
+        if not valid:
+            return (False, message)
+
+    return (True, None)
+
+
+is_tutorial_configuration.REQUIRED_FIELDS = frozenset([
+    "subjects",
+])
+"""A set of required tutorial configuration fields."""
+
+
+def is_tutorial_enable_random_order(enable_random_order):
+    raise NotImplementedError
+
+
+def is_tutorial_default_message(default_message):
+    raise NotImplementedError
+
+
+def is_tutorial_subjects(tutorial_subjects):
+    raise NotImplementedError

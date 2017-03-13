@@ -63,7 +63,7 @@ def is_configuration_set(configurations, enable_logging=False):
     validators = {
         "project": is_project_configuration,
         "task_presenter": is_task_presenter_configuration,
-        "tutorial": partial(is_tutorial_configuration, configurations["task_presenter"], validate_task_presenter_configuration=False),
+        "tutorial": partial(is_tutorial_configuration, task_presenter_configuration=configurations["task_presenter"], validate_task_presenter_configuration=False),
     }
 
     for key, configuration in configurations.iteritems():
