@@ -25,7 +25,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-from helper import is_empty_string, is_configuration_string
+from helper import is_empty_string, is_configuration_string, find_unexpected_keys
 
 def is_question(question, available_languages=None):
     """Validates the specified question configuration.
@@ -273,28 +273,6 @@ is_question_input_type.INPUT_TYPES = frozenset([
 """A collection of question input types."""
 
 
-def __find_unexpected_keys(dictionary, expected_keys):
-    """Returns a list of keys that are not expected to be in the specified dictionary.
-
-    Args:
-        dictionary (dict): A dictionary containing keys to check.
-        expected_keys (frozenset): A set of keys expected to be in the specified dictionary.
-
-    Returns:
-        list: A list of keys that are not expected to be in the specified dictionary.
-
-    Raises:
-        TypeError: If the dictionary argument is not a dict, or the expected_keys
-            argument is not a frozenset.
-    """
-    if not isinstance(dictionary, dict):
-        raise TypeError("Invalid argument type: __find_unexpected_keys expects 'dict' for dictionary argument but got '{}'.".format(type(dictionary).__name__))
-    elif not isinstance(expected_keys, frozenset):
-        raise TypeError("Invalid argument type: __find_unexpected_keys expects 'frozenset' for expected_keys argument but got '{}'.".format(type(expected_keys).__name__))
-
-    return [k for k in dictionary.keys() if k not in expected_keys]
-
-
 def __is_polar_input(question_input, _):
     """Validates the specified polar input configuration.
 
@@ -308,7 +286,7 @@ def __is_polar_input(question_input, _):
     Returns:
         <True, None>: A pair containing the value True, and no error message.
     """
-    unexpected_keys = __find_unexpected_keys(question_input, __is_polar_input.FIELDS)
+    unexpected_keys = find_unexpected_keys(question_input, __is_polar_input.FIELDS)
     if unexpected_keys:
         message = "The polar input configuration contains the following unrecognized fields: '{}'."
         return (False, message.format("', '".join(unexpected_keys)))
@@ -327,7 +305,7 @@ def __is_dropdown_list_input(question_input, languages=None):
 
 
 def __is_multiple_option_input(question_input, languages=None):
-    unexpected_keys = __find_unexpected_keys(question_input, __is_multiple_option_input.FIELDS)
+    unexpected_keys = find_unexpected_keys(question_input, __is_multiple_option_input.FIELDS)
     if unexpected_keys:
         message = "The multiple-option input configuration contains the following unrecognized fields: '{}'."
         return (False, message.format("', '".join(unexpected_keys)))
@@ -407,7 +385,7 @@ def __is_text_input(question_input, languages=None):
         <bool, str|None>: A pair containing the value True if the specified configuration
             is valid, False otherwise; as well as an error message in case it is invalid.
     """
-    unexpected_keys = __find_unexpected_keys(question_input, __is_text_input.FIELDS)
+    unexpected_keys = find_unexpected_keys(question_input, __is_text_input.FIELDS)
     if unexpected_keys:
         message = "The text input configuration contains the following unrecognized fields: '{}'."
         return (False, message.format("', '".join(unexpected_keys)))
@@ -479,7 +457,7 @@ def __is_geotagging_input(question_input, _):
         <bool, str|None>: A pair containing the value True if the specified configuration
             is valid, False otherwise; as well as an error message in case it is invalid.
     """
-    unexpected_keys = __find_unexpected_keys(question_input, __is_geotagging_input.FIELDS)
+    unexpected_keys = find_unexpected_keys(question_input, __is_geotagging_input.FIELDS)
     if unexpected_keys:
         message = "The geotagging input configuration contains the following unrecognized fields: '{}'."
         return (False, message.format("', '".join(unexpected_keys)))

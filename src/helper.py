@@ -359,3 +359,25 @@ def deserialize_configurations(path): #pragma: no cover
                 raise
 
     return configurations
+
+
+def find_unexpected_keys(dictionary, expected_keys): # pragma: no cover
+    """Returns a list of keys that are not expected to be in the specified dictionary.
+
+    Args:
+        dictionary (dict): A dictionary containing keys to check.
+        expected_keys (frozenset): A set of keys expected to be in the specified dictionary.
+
+    Returns:
+        list: A list of keys that are not expected to be in the specified dictionary.
+
+    Raises:
+        TypeError: If the dictionary argument is not a dict, or the expected_keys
+            argument is not a frozenset.
+    """
+    if not isinstance(dictionary, dict):
+        raise TypeError("Invalid argument type: find_unexpected_keys expects 'dict' for dictionary argument but got '{}'.".format(type(dictionary).__name__))
+    elif not isinstance(expected_keys, frozenset):
+        raise TypeError("Invalid argument type: find_unexpected_keys expects 'frozenset' for expected_keys argument but got '{}'.".format(type(expected_keys).__name__))
+
+    return [k for k in dictionary.keys() if k not in expected_keys]
