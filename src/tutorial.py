@@ -25,6 +25,8 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
+from helper import is_configuration_string, find_unexpected_keys
+
 def is_tutorial_configuration(
     tutorial_configuration,
     task_presenter_configuration,
@@ -41,7 +43,7 @@ def is_tutorial_configuration(
 
     Returns:
         <bool, str|None>: A pair containing the value True if the specified configuration
-            is valid, False otherwise; and an error message in case the name is invalid.
+            is valid, False otherwise; and an error message in case the configuration is invalid.
 
     Raises:
         TypeError: If either of the configuration arguments is not a dictionary, or the
@@ -66,9 +68,12 @@ def is_tutorial_configuration(
     if missing:
         return (False, "The tutorial configuration is missing the following fields: '{}'.".format("', '".join(missing)))
 
+    available_languages = task_presenter_configuration["language"]["available"] if "language" in task_presenter_configuration else None
+
+    from functools import partial
     validators = {
         "enable-random-order": is_tutorial_enable_random_order,
-        "default-message": is_tutorial_default_message,
+        "default-message": partial(is_tutorial_default_message, languages=available_languages),
         "subjects": is_tutorial_subjects,
     }
     for key, configuration in tutorial_configuration.iteritems():
@@ -103,8 +108,42 @@ def is_tutorial_enable_random_order(enable_random_order):
     return (True, None) if isinstance(enable_random_order, bool) else (False, error_message)
 
 
-def is_tutorial_default_message(default_message):
-    raise NotImplementedError
+def is_tutorial_default_message(default_message, languages=None):
+    """Validates the specified set of default messages.
+
+    Args:
+        default_message (dict): A set of default messages.
+        languages (list): A list of available languages.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the specified message set
+            is valid, False otherwise; and an error message in case the set is invalid.
+    Raises:
+        TypeError: If the default_message argument is not a dictionary, or if the
+            languages argument is not a list or NoneType.
+    """
+    if not isinstance(default_message, dict):
+        raise TypeError("Invalid argument type: is_tutorial_default_message expects 'dict' for the default_message argument but got '{}'.".format(type(default_message).__name__))
+    elif languages is not None and not isinstance(languages, list):
+        raise TypeError("Invalid argument type: is_tutorial_default_message expects 'list' for the languages argument but got '{}'.".format(type(languages).__name__))
+
+    unexpected_keys = find_unexpected_keys(default_message, is_tutorial_configuration.DEFAULT_MESSAGE_FIELDS)
+    if unexpected_keys:
+        message = "The tutorial's 'default-message' contains the following unrecognized fields: '{}'."
+        return (False, message.format("', '".join(unexpected_keys)))
+
+    for key, message in default_message.iteritems():
+        if not is_configuration_string(message, languages):
+            return (False, "The tutorial's default message field '{}' is invalid. A message must be a non-empty or normalized string.".format(key))
+
+    return (True, None)
+
+
+is_tutorial_configuration.DEFAULT_MESSAGE_FIELDS = frozenset([
+    "on-wrong-answer",
+    "on-correct-answer",
+])
+"""A set of default message fields."""
 
 
 def is_tutorial_subjects(tutorial_subjects):
