@@ -25,7 +25,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-from helper import is_empty_string, is_configuration_string, find_unexpected_keys
+from helper import check_arg_type, is_empty_string, is_configuration_string, find_unexpected_keys
 
 def is_question(question, available_languages=None):
     """Validates the specified question configuration.
@@ -51,10 +51,8 @@ def is_question(question, available_languages=None):
         TypeError: If the question argument is not a dictionary or available_languages is
         not a list or NoneType.
     """
-    if not isinstance(question, dict):
-        raise TypeError("Invalid argument type: is_question expects 'dict' for the question argument but got '{}'.".format(type(question).__name__))
-    elif available_languages is not None and not isinstance(available_languages, list):
-        raise TypeError("Invalid argument type: is_question expects 'list' for the available_languages argument but got '{}'.".format(type(available_languages).__name__))
+    check_arg_type(is_question, "question", question, dict)
+    check_arg_type(is_question, "available_languages", available_languages, (list, type(None)))
 
     missing = [k for k in is_question.REQUIRED_FIELDS if k not in question or question[k] is None]
     if missing:
@@ -224,6 +222,8 @@ def is_question_branch(question_branch):
     Raises:
         TypeError: If the question_branch argument is not a string or dictionary.
     """
+    check_arg_type(is_question_branch, "question_branch", question_branch, (basestring, dict))
+
     if isinstance(question_branch, basestring):
         if not __is_key(question_branch):
             return (False, "A question branch string must be a valid key, reserved or otherwise.")
@@ -233,8 +233,6 @@ def is_question_branch(question_branch):
                 return (False, "A question branch string must be a valid key, reserved or otherwise.")
         else:
             return (False, "A question branch dictionary must contain at least one answer-key pair.")
-    else:
-        raise TypeError("Invalid argument type: is_question_branch expects 'basestring' or 'dict' for the question_branch argument but got '{}'.".format(type(question_branch).__name__))
 
     return (True, None)
 
@@ -498,10 +496,8 @@ def is_question_input(question_input, languages=None):
         TypeError: If the question_input argument is not a dictionary, or if languages
             is not a list or NoneType.
     """
-    if not isinstance(question_input, dict):
-        raise TypeError("Invalid argument type: is_question_input expects 'dict' for the question_input argument but got '{}'.".format(type(question_input).__name__))
-    elif languages is not None and not isinstance(languages, list):
-        raise TypeError("Invalid argument type: is_question_input expects 'list' or 'NoneType' for the languages argument but got '{}'.".format(type(languages).__name__))
+    check_arg_type(is_question_input, "question_input", question_input, dict)
+    check_arg_type(is_question_input, "languages", languages, (list, type(None)))
 
     missing = [k for k in is_question_input.REQUIRED_FIELDS if k not in question_input or question_input[k] is None]
     if missing:

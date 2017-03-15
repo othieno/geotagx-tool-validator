@@ -25,6 +25,33 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
+def check_arg_type(f, arg_name, arg_value, expected_type): # pragma: no cover
+    """Checks the specified argument's type.
+
+    Args:
+        f (function): The function that the argument belongs to.
+        arg_name (str): The argument's name in string format.
+        arg_value: The argument's value.
+        expected_type: The argument's expected type(s).
+
+    Raises:
+        TypeError: If the specified argument value's type is not expected.
+        AssertionError: If the f argument is not a function, or the arg_name is not a string.
+    """
+    assert(callable(f))
+    assert(isinstance(arg_name, str))
+
+    if not isinstance(arg_value, expected_type):
+        message = "Invalid argument type: {} expects '{}' for the '{}' argument but got '{}'."
+        arg_type = type(arg_value).__name__
+        try:
+            types = "' or '".join([t.__name__ for t in expected_type])
+        except TypeError:
+            types = expected_type.__name__
+        finally:
+            raise TypeError(message.format(f.func_name, types, arg_name, arg_type))
+
+
 def is_empty_string(empty_string):
     """Checks if the specified string is empty.
 
@@ -40,8 +67,7 @@ def is_empty_string(empty_string):
     Raises:
         TypeError: If the empty_string argument is not a string.
     """
-    if not isinstance(empty_string, basestring):
-        raise TypeError("Invalid argument type: is_empty_string expects 'basestring' but got '{}'.".format(type(empty_string).__name__))
+    check_arg_type(is_empty_string, "empty_string", empty_string, basestring)
 
     return not empty_string or empty_string.isspace()
 
@@ -64,8 +90,7 @@ def is_normalized_string(normalized_string, language_codes=None):
         TypeError: If the normalized_string argument is not a dictionary or if the language_codes argument is
             not a list or a NoneType.
     """
-    if not isinstance(normalized_string, dict):
-        raise TypeError("Invalid argument type: is_normalized_string expects 'dict' for normalized_string argument but got '{}'.".format(type(normalized_string).__name__))
+    check_arg_type(is_normalized_string, "normalized_string", normalized_string, dict)
 
     if language_codes is not None and not isinstance(language_codes, list):
         raise TypeError("Invalid argument type: is_normalized_string expects 'list' for language_codes argument but got '{}'.".format(type(language_codes).__name__))
@@ -100,12 +125,12 @@ def is_configuration_string(configuration_string, language_codes=None):
         TypeError: If the configuration_string argument is not a string or dictionary,
             or if the language_codes argument is not a list or NoneType.
     """
+    check_arg_type(is_configuration_string, "configuration_string", configuration_string, (basestring, dict))
+
     if isinstance(configuration_string, basestring):
         return not is_empty_string(configuration_string)
     elif isinstance(configuration_string, dict):
         return is_normalized_string(configuration_string, language_codes)
-    else:
-        raise TypeError("Invalid argument type: is_configuration_string expects 'basestring' or 'dict' for configuration_string argument but got '{}'.".format(type(configuration_string).__name__))
 
 
 def is_url(url):
@@ -248,10 +273,8 @@ def is_directory(path, check_writable=False): #pragma: no cover
     Raises:
         TypeError: If the path argument is not a string or check_writable argument is not a boolean.
     """
-    if not isinstance(path, basestring):
-        raise TypeError("Invalid argument type: is_directory expects 'str' or 'unicode' for path argument but got '{}'.".format(type(path).__name__))
-    elif not isinstance(check_writable, bool):
-        raise TypeError("Invalid argument type: is_directory expects 'bool' for check_writable argument but got '{}'.".format(type(check_writable).__name__))
+    check_arg_type(is_directory, "path", path, basestring)
+    check_arg_type(is_directory, "check_writable", check_writable, bool)
 
     import os
     return os.path.isdir(path) and os.access(path, os.R_OK | os.W_OK if check_writable else os.R_OK)
@@ -306,8 +329,7 @@ def sanitize_paths(paths): #pragma: no cover
         TypeError: If the paths argument is not a list or one of its elements is not a string.
         IOError: If a path is inaccessible or not a directory.
     """
-    if not isinstance(paths, list):
-        raise TypeError("Invalid argument type: sanitize_paths expects 'list' for paths argument but got '{}'.".format(type(paths).__name__))
+    check_arg_type(sanitize_paths, "paths", paths, list)
 
     from os.path import realpath
     return filter(is_project_directory, set([realpath(p) for p in paths]))
@@ -375,9 +397,7 @@ def find_unexpected_keys(dictionary, expected_keys): # pragma: no cover
         TypeError: If the dictionary argument is not a dict, or the expected_keys
             argument is not a frozenset.
     """
-    if not isinstance(dictionary, dict):
-        raise TypeError("Invalid argument type: find_unexpected_keys expects 'dict' for dictionary argument but got '{}'.".format(type(dictionary).__name__))
-    elif not isinstance(expected_keys, frozenset):
-        raise TypeError("Invalid argument type: find_unexpected_keys expects 'frozenset' for expected_keys argument but got '{}'.".format(type(expected_keys).__name__))
+    check_arg_type(find_unexpected_keys, "dictionary", dictionary, dict)
+    check_arg_type(find_unexpected_keys, "expected_keys", expected_keys, frozenset)
 
     return [k for k in dictionary.keys() if k not in expected_keys]

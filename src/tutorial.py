@@ -25,7 +25,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-from helper import is_configuration_string, find_unexpected_keys
+from helper import check_arg_type, is_configuration_string, find_unexpected_keys
 
 def is_tutorial_configuration(
     tutorial_configuration,
@@ -49,14 +49,10 @@ def is_tutorial_configuration(
         TypeError: If either of the configuration arguments is not a dictionary, or the
             remaining arguments are not booleans.
     """
-    if not isinstance(tutorial_configuration, dict):
-        raise TypeError("Invalid argument type: is_tutorial_configuration expects 'dict' for the tutorial_configuration argument but got '{}'.".format(type(tutorial_configuration).__name__))
-    elif not isinstance(task_presenter_configuration, dict):
-        raise TypeError("Invalid argument type: is_tutorial_configuration expects 'dict' for the task_presenter_configuration argument but got '{}'.".format(type(task_presenter_configuration).__name__))
-    elif not isinstance(enable_logging, bool):
-        raise TypeError("Invalid argument type: is_tutorial_configuration expects 'bool' for the enable_logging argument but got '{}'.".format(type(enable_logging).__name__))
-    elif not isinstance(validate_task_presenter_configuration, bool):
-        raise TypeError("Invalid argument type: is_tutorial_configuration expects 'bool' for the validate_task_presenter_configuration argument but got '{}'.".format(type(validate_task_presenter_configuration).__name__))
+    check_arg_type(is_tutorial_configuration, "tutorial_configuration", tutorial_configuration, dict)
+    check_arg_type(is_tutorial_configuration, "task_presenter_configuration", task_presenter_configuration, dict)
+    check_arg_type(is_tutorial_configuration, "enable_logging", enable_logging, bool)
+    check_arg_type(is_tutorial_configuration, "validate_task_presenter_configuration", validate_task_presenter_configuration, bool)
 
     if validate_task_presenter_configuration:
         from task_presenter import is_task_presenter_configuration
@@ -122,10 +118,8 @@ def is_tutorial_default_message(default_message, languages=None):
         TypeError: If the default_message argument is not a dictionary, or if the
             languages argument is not a list or NoneType.
     """
-    if not isinstance(default_message, dict):
-        raise TypeError("Invalid argument type: is_tutorial_default_message expects 'dict' for the default_message argument but got '{}'.".format(type(default_message).__name__))
-    elif languages is not None and not isinstance(languages, list):
-        raise TypeError("Invalid argument type: is_tutorial_default_message expects 'list' for the languages argument but got '{}'.".format(type(languages).__name__))
+    check_arg_type(is_tutorial_default_message, "default_message", default_message, dict)
+    check_arg_type(is_tutorial_default_message, "languages", languages, (list, type(None)))
 
     unexpected_keys = find_unexpected_keys(default_message, is_tutorial_configuration.DEFAULT_MESSAGE_FIELDS)
     if unexpected_keys:

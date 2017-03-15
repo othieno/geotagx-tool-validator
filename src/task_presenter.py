@@ -25,7 +25,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-from helper import is_language_code, is_empty_string
+from helper import check_arg_type, is_language_code, is_empty_string
 
 def is_task_presenter_configuration(configuration, enable_logging=False):
     """Validates the specified task presenter configuration.
@@ -41,10 +41,8 @@ def is_task_presenter_configuration(configuration, enable_logging=False):
     Raises:
         TypeError: If the configuration argument is not a dictionary or enable_logging is not a boolean.
     """
-    if not isinstance(configuration, dict):
-        raise TypeError("Invalid argument type: is_task_presenter_configuration expects 'dict' for the configuration argument but got '{}'.".format(type(configuration).__name__))
-    elif not isinstance(enable_logging, bool):
-        raise TypeError("Invalid argument type: is_task_presenter_configuration expects 'bool' for the enable_logging argument but got '{}'.".format(type(enable_logging).__name__))
+    check_arg_type(is_task_presenter_configuration, "configuration", configuration, dict)
+    check_arg_type(is_task_presenter_configuration, "enable_logging", enable_logging, bool)
 
     missing = [k for k in is_task_presenter_configuration.REQUIRED_FIELDS if k not in configuration]
     if missing:
@@ -92,8 +90,7 @@ def is_task_presenter_language(language):
     Raises:
         TypeError: If the 'language' argument is not a dictionary.
     """
-    if not isinstance(language, dict):
-        raise TypeError("Invalid argument type: is_task_presenter_language expects 'dict' for the language argument but got '{}'.".format(type(language).__name__))
+    check_arg_type(is_task_presenter_language, "language", language, dict)
 
     missing = [k for k in is_task_presenter_language.REQUIRED_FIELDS if k not in language]
     if missing:
@@ -140,8 +137,7 @@ def is_task_presenter_subject(subject):
     Raises:
         TypeError: If the 'subject' argument is not a dictionary.
     """
-    if not isinstance(subject, dict):
-        raise TypeError("Invalid argument type: is_task_presenter_subject expects 'dict' for the subject argument but got '{}'.".format(type(subject).__name__))
+    check_arg_type(is_task_presenter_subject, "subject", subject, dict)
 
     missing = [k for k in is_task_presenter_subject.REQUIRED_FIELDS if k not in subject]
     if missing:
@@ -169,7 +165,7 @@ is_task_presenter_subject.REQUIRED_FIELDS = frozenset([
 """A set of required subject configuration fields."""
 
 
-def is_task_presenter_questionnaire(questionnaire, available_languages=None):
+def is_task_presenter_questionnaire(questionnaire, languages=None):
     """Validates the specified questionnaire configuration.
 
     A valid questionnanire configuration is comprised of the following fields:
@@ -177,20 +173,18 @@ def is_task_presenter_questionnaire(questionnaire, available_languages=None):
 
     Args:
         questionnanire (dict): A task presenter questionnanire configuration to validate.
-        available_languages (list): A list of available languages.
+        languages (list): A list of available languages.
 
     Returns:
         <bool, str|None>: A pair containing the value True if the specified configuration
             is valid, False otherwise; as well as an error message in case it is invalid.
 
     Raises:
-        TypeError: If the questionnaire argument is not a dictionary or available_languages
+        TypeError: If the questionnaire argument is not a dictionary or languages
         is not a list or NoneType.
     """
-    if not isinstance(questionnaire, dict):
-        raise TypeError("Invalid argument type: is_task_presenter_questionnaire expects 'dict' for the questionnaire argument but got '{}'.".format(type(questionnaire).__name__))
-    elif available_languages is not None and not isinstance(available_languages, list):
-        raise TypeError("Invalid argument type: is_task_presenter_questionnaire expects 'list' for the available_languages argument but got '{}'.".format(type(available_languages).__name__))
+    check_arg_type(is_task_presenter_questionnaire, "questionnaire", questionnaire, dict)
+    check_arg_type(is_task_presenter_questionnaire, "languages", languages, (list, type(None)))
 
     missing = [k for k in ["questions"] if k not in questionnaire]
     if missing:
@@ -203,7 +197,7 @@ def is_task_presenter_questionnaire(questionnaire, available_languages=None):
     else:
         from question import is_question
         for q in questions:
-            valid, message = is_question(q, available_languages)
+            valid, message = is_question(q, languages)
             if not valid:
                 return (False, message)
 

@@ -25,7 +25,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-from helper import is_empty_string, is_url
+from helper import check_arg_type, is_empty_string, is_url
 
 def is_project_configuration(configuration, enable_logging=False):
     """Validates the specified project configuration.
@@ -41,10 +41,8 @@ def is_project_configuration(configuration, enable_logging=False):
     Raises:
         TypeError: If the configuration argument is not a dictionary or enable_logging is not a boolean.
     """
-    if not isinstance(configuration, dict):
-        raise TypeError("Invalid argument type: is_project_configuration expects 'dict' for the configuration argument but got '{}'.".format(type(configuration).__name__))
-    elif not isinstance(enable_logging, bool):
-        raise TypeError("Invalid argument type: is_project_configuration expects 'bool' for the enable_logging argument but got '{}'.".format(type(enable_logging).__name__))
+    check_arg_type(is_project_configuration, "configuration", configuration, dict)
+    check_arg_type(is_project_configuration, "enable_logging", enable_logging, bool)
 
     missing = [k for k in is_project_configuration.REQUIRED_FIELDS if k not in configuration]
     if missing:

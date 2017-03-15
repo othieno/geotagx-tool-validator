@@ -27,6 +27,7 @@
 from project import is_project_configuration
 from task_presenter import is_task_presenter_configuration
 from tutorial import is_tutorial_configuration
+from helper import check_arg_type
 
 def is_configuration_set(configurations, enable_logging=False):
     """Validates the specified set of configurations.
@@ -50,10 +51,8 @@ def is_configuration_set(configurations, enable_logging=False):
         TypeError: If the configurations argument is not a dictionary or enable_logging is not a boolean.
         ValueError: If a required configuration is missing from the configuration set.
     """
-    if not isinstance(configurations, dict):
-        raise TypeError("Invalid argument type: validate_configurations expects 'dict' for the configurations parameter but got '{}'.".format(type(configurations).__name__))
-    elif not isinstance(enable_logging, bool):
-        raise TypeError("Invalid argument type: validate_configurations expects 'bool' for the enable_logging parameter but got '{}'.".format(type(enable_logging).__name__))
+    check_arg_type(is_configuration_set, "configurations", configurations, dict)
+    check_arg_type(is_configuration_set, "enable_logging", enable_logging, bool)
 
     is_nonempty_dictionary = lambda d: isinstance(d, dict) and len(d) > 0
     if not all(is_nonempty_dictionary(configurations.get(k)) for k in ["project", "task_presenter"]):
