@@ -254,4 +254,54 @@ def is_tutorial_subject_page(tutorial_subject_page):
 
 
 def __is_tutorial_subject_assertions(tutorial_subject_assertions, languages=None):
+    """Validates the specified set of tutorial subject assertions.
+
+    Args:
+        tutorial_subject_assertions (dict): A set of assertions to validate.
+        languages (list): A list of available languages.
+
+    Returns:
+        <bool, str|NoneType>: A pair containing the value True if the specified set of
+            assertions is valid, False otherwise; and an error message in case validation failed.
+
+    Raises:
+        TypeError: If the tutorial_subject_assertions argument is not a dictionary, or
+            the languages argument is not a list or NoneType.
+    """
+    check_arg_type(__is_tutorial_subject_assertions, "tutorial_subject_assertions", tutorial_subject_assertions, dict)
+    check_arg_type(__is_tutorial_subject_assertions, "languages", languages, (list, type(None)))
+
+    from question import is_question_key
+    for key, assertion in tutorial_subject_assertions.iteritems():
+        valid, message = is_question_key(key)
+        if not valid:
+            return (False, message)
+
+        valid, message = is_tutorial_subject_assertion(assertion, languages)
+        if not valid:
+            return (False, message)
+
+    return (True, None)
+
+
+def is_tutorial_subject_assertion(tutorial_subject_assertion, languages=None):
+    """Validates the specified tutorial subject assertion.
+
+    Args:
+        tutorial_subject_assertion (dict): A subject assertion to validate.
+        languages (list): A list of available languages.
+
+    Returns:
+        <bool, str|NoneType>: A pair containing the value True if the specified assertion
+            is valid, False otherwise; and an error message in case validation failed.
+
+    Raises:
+        TypeError: If the tutorial_subject_assertion argument is not a dictionary, or
+            the languages argument is not a list or NoneType.
+    """
+    check_arg_type(is_tutorial_subject_assertion, "tutorial_subject_assertion", tutorial_subject_assertion, dict)
+    check_arg_type(is_tutorial_subject_assertion, "languages", languages, (list, type(None)))
+
     raise NotImplementedError
+
+    return (True, None)
