@@ -25,7 +25,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-from helper import check_arg_type, is_configuration_string, find_unexpected_keys
+from helper import check_arg_type, is_empty_string, is_configuration_string, find_unexpected_keys
 
 def is_tutorial_configuration(
     tutorial_configuration,
@@ -220,7 +220,20 @@ is_tutorial_subject.REQUIRED_FIELDS = frozenset([
 
 
 def is_tutorial_subject_source(tutorial_subject_source):
-    raise NotImplementedError
+    """Validates the specified tutorial subject source.
+
+    Args:
+        tutorial_subject_source (basestring): A source to validate.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the specified source
+            is valid, False otherwise; and an error message in case the source is invalid.
+
+    Raises:
+        TypeError: If the tutorial_subject_source argument is not a string.
+    """
+    message = "A tutorial subject's 'source' field must be a non-empty string."
+    return (False, message) if is_empty_string(tutorial_subject_source) else (True, None)
 
 
 def is_tutorial_subject_page(tutorial_subject_page):
