@@ -174,7 +174,7 @@ def is_tutorial_subject(tutorial_subject, languages=None):
 
     Args:
         tutorial_subject (dict): A tutorial subject to validate.
-        languages (list|NoneType): A list of available languages.
+        languages (list): A list of available languages.
 
     Returns:
         <bool, str|NoneType>: A pair containing the value True if the specified subject
@@ -187,6 +187,45 @@ def is_tutorial_subject(tutorial_subject, languages=None):
     check_arg_type(is_tutorial_subject, "tutorial_subject", tutorial_subject, dict)
     check_arg_type(is_tutorial_subject, "languages", languages, (list, type(None)))
 
-    raise NotImplementedError
+    missing = [k for k in is_tutorial_subject.REQUIRED_FIELDS if k not in tutorial_subject]
+    if missing:
+        message = "A tutorial's subject configuration is missing the following fields: '{}'."
+        return (False, message.format("', '".join(missing)))
+
+    from functools import partial
+    validators = {
+        "source": is_tutorial_subject_source,
+        "page": is_tutorial_subject_page,
+        "assertions": partial(is_tutorial_subject_assertions, languages=languages),
+    }
+
+    for key, field in tutorial_subject.iteritems():
+        validator = validators.get(key)
+        if not validator:
+            return (False, "The field '{}' is not a recognized tutorial subject field.".format(key))
+
+        valid, message = validator(field)
+        if not valid:
+            return (False, message)
 
     return (True, None)
+
+
+is_tutorial_subject.REQUIRED_FIELDS = frozenset([
+    "source",
+    "page",
+    "assertions",
+])
+"""A collection of required tutorial subject fields."""
+
+
+def is_tutorial_subject_source(tutorial_subject_source):
+    raise NotImplementedError
+
+
+def is_tutorial_subject_page(tutorial_subject_page):
+    raise NotImplementedError
+
+
+def is_tutorial_subject_assertions(tutorial_subject_assertions, languages=None):
+    raise NotImplementedError
