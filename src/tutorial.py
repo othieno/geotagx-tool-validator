@@ -70,7 +70,7 @@ def is_tutorial_configuration(
     validators = {
         "enable-random-order": is_tutorial_enable_random_order,
         "default-message": partial(is_tutorial_default_message, languages=available_languages),
-        "subjects": is_tutorial_subjects,
+        "subjects": partial(is_tutorial_subjects, languages=available_languages),
     }
     for key, configuration in tutorial_configuration.iteritems():
         validator = validators.get(key)
@@ -140,5 +140,53 @@ is_tutorial_configuration.DEFAULT_MESSAGE_FIELDS = frozenset([
 """A set of default message fields."""
 
 
-def is_tutorial_subjects(tutorial_subjects):
+def is_tutorial_subjects(tutorial_subjects, languages=None):
+    """Validates the specified list of tutorial subjects.
+
+    Args:
+        tutorial_subjects (list): A list of tutorial subjects to validate.
+        languages (list): A list of available languages.
+
+    Returns:
+        <bool, str|None>: A pair containing the value True if the specified list
+            is valid, False otherwise; and an error message in case the list is invalid.
+
+    Raises:
+        TypeError: If the tutorial_subjects argument is not a list, or the languages
+            argument is not a list or NoneType.
+    """
+    check_arg_type(is_tutorial_subjects, "tutorial_subjects", tutorial_subjects, list)
+    check_arg_type(is_tutorial_subjects, "languages", languages, (list, type(None)))
+
+    if not tutorial_subjects:
+        return (False, "A project tutorial must contain one or more subjects.")
+
+    for s in tutorial_subjects:
+        valid, message = is_tutorial_subject(s, languages)
+        if not valid:
+            return (False, message)
+
+    return (True, None)
+
+
+def is_tutorial_subject(tutorial_subject, languages=None):
+    """Validates the specified tutorial subject.
+
+    Args:
+        tutorial_subject (dict): A tutorial subject to validate.
+        languages (list|NoneType): A list of available languages.
+
+    Returns:
+        <bool, str|NoneType>: A pair containing the value True if the specified subject
+            is valid, False otherwise; and an error message in case the subject is invalid.
+
+    Raises:
+        TypeError: If the tutorial_subject argument is not a dictionary, or the languages
+            argument is not a list or NoneType.
+    """
+    check_arg_type(is_tutorial_subject, "tutorial_subject", tutorial_subject, dict)
+    check_arg_type(is_tutorial_subject, "languages", languages, (list, type(None)))
+
     raise NotImplementedError
+
+    return (True, None)
