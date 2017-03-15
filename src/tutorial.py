@@ -70,7 +70,7 @@ def is_tutorial_configuration(
     validators = {
         "enable-random-order": is_tutorial_enable_random_order,
         "default-message": partial(is_tutorial_default_message, languages=available_languages),
-        "subjects": partial(is_tutorial_subjects, languages=available_languages),
+        "subjects": partial(__is_tutorial_subjects, languages=available_languages),
     }
     for key, configuration in tutorial_configuration.iteritems():
         validator = validators.get(key)
@@ -140,7 +140,7 @@ is_tutorial_configuration.DEFAULT_MESSAGE_FIELDS = frozenset([
 """A set of default message fields."""
 
 
-def is_tutorial_subjects(tutorial_subjects, languages=None):
+def __is_tutorial_subjects(tutorial_subjects, languages=None):
     """Validates the specified list of tutorial subjects.
 
     Args:
@@ -155,8 +155,8 @@ def is_tutorial_subjects(tutorial_subjects, languages=None):
         TypeError: If the tutorial_subjects argument is not a list, or the languages
             argument is not a list or NoneType.
     """
-    check_arg_type(is_tutorial_subjects, "tutorial_subjects", tutorial_subjects, list)
-    check_arg_type(is_tutorial_subjects, "languages", languages, (list, type(None)))
+    check_arg_type(__is_tutorial_subjects, "tutorial_subjects", tutorial_subjects, list)
+    check_arg_type(__is_tutorial_subjects, "languages", languages, (list, type(None)))
 
     if not tutorial_subjects:
         return (False, "A project tutorial must contain one or more subjects.")
@@ -196,7 +196,7 @@ def is_tutorial_subject(tutorial_subject, languages=None):
     validators = {
         "source": is_tutorial_subject_source,
         "page": is_tutorial_subject_page,
-        "assertions": partial(is_tutorial_subject_assertions, languages=languages),
+        "assertions": partial(__is_tutorial_subject_assertions, languages=languages),
     }
 
     for key, field in tutorial_subject.iteritems():
@@ -253,5 +253,5 @@ def is_tutorial_subject_page(tutorial_subject_page):
     return (False, message) if is_empty_string(tutorial_subject_page) else (True, None)
 
 
-def is_tutorial_subject_assertions(tutorial_subject_assertions, languages=None):
+def __is_tutorial_subject_assertions(tutorial_subject_assertions, languages=None):
     raise NotImplementedError
