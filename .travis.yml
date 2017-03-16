@@ -7,7 +7,7 @@ install:
     - pip install python-coveralls
     - python setup.py -q install
 script:
-    - nosetests --with-coverage -v
+    - nosetests --with-coverage --cover-erase --detailed-errors -v
 branches:
     only:
         - master
