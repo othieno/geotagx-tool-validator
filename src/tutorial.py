@@ -66,11 +66,21 @@ def is_tutorial_configuration(
 
     available_languages = task_presenter_configuration["language"]["available"] if "language" in task_presenter_configuration else None
 
+    def is_subjects(subjects):
+        check_arg_type(is_subjects, "subjects", subjects, list)
+        if not subjects:
+            return (False, "A project tutorial must contain at least one subject.")
+        for subject in subjects:
+            valid, message = is_tutorial_subject(subject, available_languages)
+            if not valid:
+                return (False, message)
+        return (True, None)
+
     from functools import partial
     validators = {
         "enable-random-order": is_tutorial_enable_random_order,
         "default-message": partial(is_tutorial_default_message, languages=available_languages),
-        "subjects": partial(__is_tutorial_subjects, languages=available_languages),
+        "subjects": is_subjects,
     }
     for key, configuration in tutorial_configuration.iteritems():
         validator = validators.get(key)
@@ -138,35 +148,6 @@ is_tutorial_configuration.DEFAULT_MESSAGE_FIELDS = frozenset([
     "on-correct-answer",
 ])
 """A set of default message fields."""
-
-
-def __is_tutorial_subjects(tutorial_subjects, languages=None):
-    """Validates the specified list of tutorial subjects.
-
-    Args:
-        tutorial_subjects (list): A list of tutorial subjects to validate.
-        languages (list): A list of available languages.
-
-    Returns:
-        <bool, str|None>: A pair containing the value True if the specified list
-            is valid, False otherwise; and an error message in case the list is invalid.
-
-    Raises:
-        TypeError: If the tutorial_subjects argument is not a list, or the languages
-            argument is not a list or NoneType.
-    """
-    check_arg_type(__is_tutorial_subjects, "tutorial_subjects", tutorial_subjects, list)
-    check_arg_type(__is_tutorial_subjects, "languages", languages, (list, type(None)))
-
-    if not tutorial_subjects:
-        return (False, "A project tutorial must contain one or more subjects.")
-
-    for s in tutorial_subjects:
-        valid, message = is_tutorial_subject(s, languages)
-        if not valid:
-            return (False, message)
-
-    return (True, None)
 
 
 def is_tutorial_subject(tutorial_subject, languages=None):
