@@ -192,17 +192,39 @@ def is_tutorial_subject(tutorial_subject, languages=None):
         message = "A tutorial's subject configuration is missing the following fields: '{}'."
         return (False, message.format("', '".join(missing)))
 
-    from functools import partial
-    validators = {
-        "source": is_tutorial_subject_source,
-        "page": is_tutorial_subject_page,
-        "assertions": partial(__is_tutorial_subject_assertions, languages=languages),
-    }
+    def is_source(subject_source):
+        message = "A tutorial subject's 'source' field must be a non-empty string."
+        return (False, message) if is_empty_string(subject_source) else (True, None)
 
+    def is_page(subject_page):
+        message = "A tutorial subject's 'page' field must be a non-empty string."
+        return (False, message) if is_empty_string(subject_page) else (True, None)
+
+    def is_assertions(subject_assertions):
+        check_arg_type(is_assertions, "subject_assertions", subject_assertions, dict)
+
+        from question import is_question_key
+        for key, assertion in subject_assertions.iteritems():
+            valid, message = is_question_key(key)
+            if not valid:
+                return (False, message)
+
+            valid, message = is_tutorial_subject_assertion(assertion, languages)
+            if not valid:
+                return (False, message)
+
+        return (True, None)
+
+
+    validators = {
+        "source": is_source,
+        "page": is_page,
+        "assertions": is_assertions,
+    }
     for key, field in tutorial_subject.iteritems():
         validator = validators.get(key)
         if not validator:
-            return (False, "The field '{}' is not a recognized tutorial subject field.".format(key))
+            return (False, "The tutorial subject field '{}' is not recognized.".format(key))
 
         valid, message = validator(field)
         if not valid:
@@ -217,71 +239,6 @@ is_tutorial_subject.REQUIRED_FIELDS = frozenset([
     "assertions",
 ])
 """A collection of required tutorial subject fields."""
-
-
-def is_tutorial_subject_source(tutorial_subject_source):
-    """Validates the specified tutorial subject source.
-
-    Args:
-        tutorial_subject_source (basestring): A source to validate.
-
-    Returns:
-        <bool, str|None>: A pair containing the value True if the specified source
-            is valid, False otherwise; and an error message in case the source is invalid.
-
-    Raises:
-        TypeError: If the tutorial_subject_source argument is not a string.
-    """
-    message = "A tutorial subject's 'source' field must be a non-empty string."
-    return (False, message) if is_empty_string(tutorial_subject_source) else (True, None)
-
-
-def is_tutorial_subject_page(tutorial_subject_page):
-    """Validates the specified tutorial subject page.
-
-    Args:
-        tutorial_subject_page (basestring): A page to validate.
-
-    Returns:
-        <bool, str|None>: A pair containing the value True if the specified page
-            is valid, False otherwise; and an error message in case the page is invalid.
-
-    Raises:
-        TypeError: If the tutorial_subject_page argument is not a string.
-    """
-    message = "A tutorial subject's 'page' field must be a non-empty string."
-    return (False, message) if is_empty_string(tutorial_subject_page) else (True, None)
-
-
-def __is_tutorial_subject_assertions(tutorial_subject_assertions, languages=None):
-    """Validates the specified set of tutorial subject assertions.
-
-    Args:
-        tutorial_subject_assertions (dict): A set of assertions to validate.
-        languages (list): A list of available languages.
-
-    Returns:
-        <bool, str|NoneType>: A pair containing the value True if the specified set of
-            assertions is valid, False otherwise; and an error message in case validation failed.
-
-    Raises:
-        TypeError: If the tutorial_subject_assertions argument is not a dictionary, or
-            the languages argument is not a list or NoneType.
-    """
-    check_arg_type(__is_tutorial_subject_assertions, "tutorial_subject_assertions", tutorial_subject_assertions, dict)
-    check_arg_type(__is_tutorial_subject_assertions, "languages", languages, (list, type(None)))
-
-    from question import is_question_key
-    for key, assertion in tutorial_subject_assertions.iteritems():
-        valid, message = is_question_key(key)
-        if not valid:
-            return (False, message)
-
-        valid, message = is_tutorial_subject_assertion(assertion, languages)
-        if not valid:
-            return (False, message)
-
-    return (True, None)
 
 
 def is_tutorial_subject_assertion(tutorial_subject_assertion, languages=None):
