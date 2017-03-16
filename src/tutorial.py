@@ -302,6 +302,43 @@ def is_tutorial_subject_assertion(tutorial_subject_assertion, languages=None):
     check_arg_type(is_tutorial_subject_assertion, "tutorial_subject_assertion", tutorial_subject_assertion, dict)
     check_arg_type(is_tutorial_subject_assertion, "languages", languages, (list, type(None)))
 
-    raise NotImplementedError
+    missing = [k for k in is_tutorial_subject_assertion.REQUIRED_FIELDS if k not in tutorial_subject_assertion]
+    if missing:
+        message = "A tutorial subject assertion is missing the following fields: '{}'."
+        return (False, message.format("', '".join(missing)))
+
+    def is_expects(assertion_expects):
+        message = "A tutorial subject assertion's 'expects' field must be a non-empty string."
+        return (False, message) if is_empty_string(assertion_expects) else (True, None)
+
+    def is_messages(assertion_messages):
+        check_arg_type(is_messages, "assertion_messages", assertion_messages, dict)
+        if any(not is_configuration_string(m, languages) for m in assertion_messages.itervalues()):
+            return (False, "A tutorial subject assertion message must be a non-empty or normalized string.")
+        return (True, None)
+
+    def is_autocomplete(assertion_autocomplete):
+        message = "A tutorial subject assertion's 'autocomplete' field must contain a boolean value."
+        return (True, None) if isinstance(assertion_autocomplete, bool) else (False, message)
+
+    validators = {
+        "expects": is_expects,
+        "messages": is_messages,
+        "autocomplete": is_autocomplete,
+    }
+    for key, field in tutorial_subject_assertion.iteritems():
+        validator = validators.get(key)
+        if not validator:
+            return (False, "The tutorial subject assertion field '{}' is not recognized.".format(key))
+        else:
+            valid, message = validator(field)
+            if not valid:
+                return (False, message)
 
     return (True, None)
+
+
+is_tutorial_subject_assertion.REQUIRED_FIELDS = frozenset([
+    "expects",
+])
+"""A collection of required tutorial subject assertion fields."""
