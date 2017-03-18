@@ -40,7 +40,7 @@ def run(arguments):
     Returns:
         int: 0 if validation was successful, 1 otherwise.
     """
-    from helper import sanitize_paths, deserialize_configurations
+    from helper import sanitize_paths, deserialize_configuration_set
     from core import is_configuration_set
 
     exit_code = 0
@@ -49,14 +49,14 @@ def run(arguments):
             _setup_logging(arguments.verbose)
 
         for path in sanitize_paths(arguments.paths):
-            configurations = deserialize_configurations(path)
-            valid, message = is_configuration_set(configurations, arguments.verbose)
+            configuration_set = deserialize_configuration_set(path)
+            valid, message = is_configuration_set(configuration_set, arguments.verbose)
             if not valid:
                 print message
                 exit_code = 1
                 break
             else:
-                print "'{}'... OK.".format(path)
+                print "The project located at '{}' is valid.".format(path)
     except Exception as e:
         _print_exception(e, arguments.verbose)
         exit_code = 1

@@ -352,8 +352,8 @@ def deserialize_json(filename): #pragma: no cover
         return json.loads(file.read(), object_pairs_hook=collections.OrderedDict)
 
 
-def deserialize_configurations(path): #pragma: no cover
-    """Deserializes the configuration files for GeoTag-X project located at the specified path.
+def deserialize_configuration_set(path): #pragma: no cover
+    """Deserializes the set of configuration files for GeoTag-X project located at the specified path.
 
     Args:
         path (str): A path to a directory containing a GeoTag-X project.
