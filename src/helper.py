@@ -25,6 +25,9 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
+import os
+import re
+
 def check_arg_type(f, arg_name, arg_value, expected_type): # pragma: no cover
     """Checks the specified argument's type.
 
@@ -151,7 +154,6 @@ def is_url(url):
         # The following code is inspired by the validators package from Konsta Vesterinen. Please
         # refer to https://github.com/kvesteri/validators/blob/master/validators/url.py for more
         # information.
-        import re
         regex = (
             r'^[a-z]+://([^/:]+\.[a-z]{2,10}|([0-9]{{1,3}}\.)'
             r'{{3}}[0-9]{{1,3}})(:[0-9]+)?(\/.*)?$'
@@ -176,8 +178,7 @@ def is_iso_3166_1_alpha_2_code(code):
             return False
         else:
             # TODO Optimize this: Regular expressions are a bit of an overkill.
-            from re import match
-            matches = match("[A-Z]{2}", code)
+            matches = re.match("[A-Z]{2}", code)
             return matches and matches.group() == code
     except TypeError:
         # The is_empty_string function will raise a TypeError if the code argument is not a
@@ -202,8 +203,7 @@ def is_iso_15924_code(code):
         if is_empty_string(code):
             return False
         else:
-            from re import match
-            matches = match("[A-Z]{1}[a-z]{3}", code)
+            matches = re.match("[A-Z]{1}[a-z]{3}", code)
             return matches and matches.group() == code
     except TypeError:
         # The is_empty_string function will raise a TypeError if the code argument is not a
@@ -234,8 +234,7 @@ def is_language_code(code):
         elif code in is_language_code.KNOWN_LANGUAGE_CODES:
             return True
         else:
-            from re import match
-            matches = match(r"([a-z]{2,3})(-[a-zA-Z]{2,4})?", code)
+            matches = re.match(r"([a-z]{2,3})(-[a-zA-Z]{2,4})?", code)
             if matches and matches.group() == code:
                 valid = True
                 variety = matches.group(2)
@@ -276,7 +275,6 @@ def is_directory(path, check_writable=False): #pragma: no cover
     check_arg_type(is_directory, "path", path, basestring)
     check_arg_type(is_directory, "check_writable", check_writable, bool)
 
-    import os
     return os.path.isdir(path) and os.access(path, os.R_OK | os.W_OK if check_writable else os.R_OK)
 
 
@@ -308,7 +306,6 @@ def is_project_directory(path, check_writable=True): #pragma: no cover
     if not is_directory(path, check_writable):
         raise IOError("The path '{}' is not a directory or you may not have the appropriate access permissions.".format(path))
     else:
-        import os
         # Make sure the mandatory configurations exist and are readable.
         filenames = [os.path.join(path, name) for name in ["project.json", "task_presenter.json"]]
         return all(os.path.isfile(f) and os.access(f, os.R_OK) for f in filenames)
@@ -331,8 +328,7 @@ def sanitize_paths(paths): #pragma: no cover
     """
     check_arg_type(sanitize_paths, "paths", paths, list)
 
-    from os.path import realpath
-    return filter(is_project_directory, set([realpath(p) for p in paths]))
+    return filter(is_project_directory, set([os.path.realpath(p) for p in paths]))
 
 
 def deserialize_json(filename): #pragma: no cover
@@ -373,7 +369,6 @@ def deserialize_configuration_set(path): #pragma: no cover
     configurations = {}
     for key in ["project", "task_presenter", "tutorial"]:
         try:
-            import os
             configurations[key] = deserialize_json(os.path.join(path, key + ".json"))
         except IOError:
             # If the configuration is required, re-raise the exception.
