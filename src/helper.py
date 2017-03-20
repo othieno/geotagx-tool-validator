@@ -367,13 +367,30 @@ def deserialize_configuration_set(path): #pragma: no cover
         return None
 
     configurations = {}
+    filepath = os.path.join(path, "{}.json")
     for key in ["project", "task_presenter", "tutorial"]:
         try:
-            configurations[key] = deserialize_json(os.path.join(path, key + ".json"))
+            configurations[key] = deserialize_json(filepath.format(key))
         except IOError:
-            # If the configuration is required, re-raise the exception.
-            if key in ["project", "task_presenter"]:
+            # If a configuration is required but its JSON file is missing, re-raise the exception.
+            if key in {"project", "task_presenter"}:
                 raise
+
+    # Add the questionnaire help.
+    filepath = os.path.join(path, "help", "{}.html")
+    for question in configurations["task_presenter"]["questionnaire"]["questions"]:
+        key = question["key"]
+        filename = filepath.format(key)
+        try:
+            file = open(filename)
+        except IOError:
+            # A help file is not always guaranteed to exist so if an IOError occurs, ignore it.
+            pass
+        else:
+            with file:
+                from htmlmin import minify
+                filedata = file.read().decode("UTF-8").strip()
+                question["help"] = minify(filedata, remove_comments=True, remove_empty_space=True)
 
     return configurations
 
