@@ -25,7 +25,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-from helper import check_arg_type, is_empty_string, is_configuration_string, find_unexpected_keys
+from helper import check_arg_type, is_empty_string, is_configuration_string
 
 def is_question(question, available_languages=None):
     """Validates the specified question configuration.
@@ -284,11 +284,6 @@ def __is_polar_input(question_input, _):
     Returns:
         <True, None>: A pair containing the value True, and no error message.
     """
-    unexpected_keys = find_unexpected_keys(question_input, __is_polar_input.FIELDS)
-    if unexpected_keys:
-        message = "The polar input configuration contains the following unrecognized fields: '{}'."
-        return (False, message.format("', '".join(unexpected_keys)))
-
     return (True, None)
 
 
@@ -303,11 +298,6 @@ def __is_dropdown_list_input(question_input, languages=None):
 
 
 def __is_multiple_option_input(question_input, languages=None):
-    unexpected_keys = find_unexpected_keys(question_input, __is_multiple_option_input.FIELDS)
-    if unexpected_keys:
-        message = "The multiple-option input configuration contains the following unrecognized fields: '{}'."
-        return (False, message.format("', '".join(unexpected_keys)))
-
     for key in ["enable-multiple-choices", "enable-other-option", "enable-illustrations"]:
         field = question_input.get(key)
         if field is not None and not isinstance(field, bool):
@@ -383,11 +373,6 @@ def __is_text_input(question_input, languages=None):
         <bool, str|None>: A pair containing the value True if the specified configuration
             is valid, False otherwise; as well as an error message in case it is invalid.
     """
-    unexpected_keys = find_unexpected_keys(question_input, __is_text_input.FIELDS)
-    if unexpected_keys:
-        message = "The text input configuration contains the following unrecognized fields: '{}'."
-        return (False, message.format("', '".join(unexpected_keys)))
-
     placeholder = question_input.get("placeholder")
     if placeholder is not None:
         error = (False, "A placeholder must be a non-empty or normalized string.")
@@ -455,11 +440,6 @@ def __is_geotagging_input(question_input, _):
         <bool, str|None>: A pair containing the value True if the specified configuration
             is valid, False otherwise; as well as an error message in case it is invalid.
     """
-    unexpected_keys = find_unexpected_keys(question_input, __is_geotagging_input.FIELDS)
-    if unexpected_keys:
-        message = "The geotagging input configuration contains the following unrecognized fields: '{}'."
-        return (False, message.format("', '".join(unexpected_keys)))
-
     location = question_input.get("location")
     if location is not None:
         message = "A geotagging input's 'location' field must be a non-empty string."
@@ -499,15 +479,22 @@ def is_question_input(question_input, languages=None):
     check_arg_type(is_question_input, "question_input", question_input, dict)
     check_arg_type(is_question_input, "languages", languages, (list, type(None)))
 
-    missing = [k for k in is_question_input.REQUIRED_FIELDS if k not in question_input or question_input[k] is None]
-    if missing:
+    missing_fields = [k for k in is_question_input.REQUIRED_FIELDS if k not in question_input or question_input[k] is None]
+    if missing_fields:
         message = "The question input configuration is missing the following fields: '{}'."
-        return (False, message.format("', '".join(missing)))
+        return (False, message.format("', '".join(missing_fields)))
 
     input_type = question_input["type"]
     valid, message = is_question_input_type(input_type)
     if not valid:
         return (False, message)
+
+    fields = set(question_input.keys()) - is_question_input.REQUIRED_FIELDS
+    expected_fields = is_question_input.EXPECTED_FIELDS.get(input_type)
+    unexpected_fields = fields - expected_fields
+    if unexpected_fields:
+        message = "A {} configuration contains the following unexpected fields: '{}'."
+        return (False, message.format(input_type, "', '".join(unexpected_fields)))
 
     validator = is_question_input.VALIDATORS.get(input_type)
     if not validator:
@@ -520,6 +507,51 @@ is_question_input.REQUIRED_FIELDS = frozenset([
     "type",
 ])
 """A collection of required question input fields."""
+
+
+is_question_input.EXPECTED_FIELDS = {
+    "polar": frozenset(["type"]),
+    "dropdown-list": frozenset([
+        "options",
+        "prompt",
+        "size",
+    ]),
+    "multiple-option": frozenset([
+        "options",
+        "enable-multiple-choices",
+        "enable-other-option",
+        "enable-illustrations",
+        "size",
+    ]),
+    "text": frozenset([
+        "enable-long-text",
+        "min-length",
+        "max-length",
+        "placeholder",
+    ]),
+    "number": frozenset([
+        "min-value",
+        "max-value",
+        "placeholder",
+    ]),
+    "datetime": frozenset([
+        "date-format",
+        "time-format",
+        "from",
+        "to",
+        "disable-date",
+        "disable-time",
+    ]),
+    "url": frozenset([
+        "max-length",
+        "domain",
+        "placeholder",
+    ]),
+    "geotagging": frozenset([
+        "location",
+    ]),
+}
+"""A collection of expected fields for each question input."""
 
 
 is_question_input.VALIDATORS = {

@@ -25,7 +25,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-from helper import check_arg_type, is_empty_string, is_configuration_string, find_unexpected_keys
+from helper import check_arg_type, is_empty_string, is_configuration_string
 
 def is_tutorial_configuration(
     tutorial_configuration,
@@ -131,10 +131,10 @@ def is_tutorial_default_message(default_message, languages=None):
     check_arg_type(is_tutorial_default_message, "default_message", default_message, dict)
     check_arg_type(is_tutorial_default_message, "languages", languages, (list, type(None)))
 
-    unexpected_keys = find_unexpected_keys(default_message, is_tutorial_configuration.DEFAULT_MESSAGE_FIELDS)
-    if unexpected_keys:
-        message = "The tutorial's 'default-message' contains the following unrecognized fields: '{}'."
-        return (False, message.format("', '".join(unexpected_keys)))
+    unexpected_fields = set(default_message.keys()) - is_tutorial_configuration.DEFAULT_MESSAGE_FIELDS
+    if unexpected_fields:
+        message = "The tutorial's 'default-message' contains the following unexpected fields: '{}'."
+        return (False, message.format("', '".join(unexpected_fields)))
 
     for key, message in default_message.iteritems():
         if not is_configuration_string(message, languages):

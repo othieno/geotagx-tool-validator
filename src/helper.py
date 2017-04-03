@@ -393,23 +393,3 @@ def deserialize_configuration_set(path): #pragma: no cover
                 question["help"] = minify(filedata, remove_comments=True, remove_empty_space=True)
 
     return configurations
-
-
-def find_unexpected_keys(dictionary, expected_keys): # pragma: no cover
-    """Returns a list of keys that are not expected to be in the specified dictionary.
-
-    Args:
-        dictionary (dict): A dictionary containing keys to check.
-        expected_keys (frozenset): A set of keys expected to be in the specified dictionary.
-
-    Returns:
-        list: A list of keys that are not expected to be in the specified dictionary.
-
-    Raises:
-        TypeError: If the dictionary argument is not a dict, or the expected_keys
-            argument is not a frozenset.
-    """
-    check_arg_type(find_unexpected_keys, "dictionary", dictionary, dict)
-    check_arg_type(find_unexpected_keys, "expected_keys", expected_keys, frozenset)
-
-    return [k for k in dictionary.keys() if k not in expected_keys]
