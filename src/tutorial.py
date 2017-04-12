@@ -181,6 +181,10 @@ def is_tutorial_subject(tutorial_subject, languages=None):
         message = "A tutorial subject's 'page' field must be a non-empty string."
         return (False, message) if is_empty_string(subject_page) else (True, None)
 
+    def is_attribution(subject_attribution):
+        message = "A tutorial subject's 'attribution' field must be a non-empty string."
+        return (False, message) if is_empty_string(subject_attribution) else (True, None)
+
     def is_assertions(subject_assertions):
         check_arg_type(is_assertions, "subject_assertions", subject_assertions, dict)
 
@@ -200,6 +204,7 @@ def is_tutorial_subject(tutorial_subject, languages=None):
     validators = {
         "source": is_source,
         "page": is_page,
+        "attribution": is_attribution,
         "assertions": is_assertions,
     }
     for key, field in tutorial_subject.iteritems():
