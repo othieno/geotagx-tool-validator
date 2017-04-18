@@ -94,18 +94,19 @@ def is_normalized_string(normalized_string, language_codes=None):
             not a list or a NoneType.
     """
     check_arg_type(is_normalized_string, "normalized_string", normalized_string, dict)
-
-    if language_codes is not None and not isinstance(language_codes, list):
-        raise TypeError("Invalid argument type: is_normalized_string expects 'list' for language_codes argument but got '{}'.".format(type(language_codes).__name__))
+    check_arg_type(is_normalized_string, "language_codes", language_codes, (list, type(None)))
 
     try:
-        return normalized_string and \
-               (True if language_codes is None else all(l in normalized_string for l in language_codes)) and \
-               all(is_language_code(k) and not is_empty_string(v) for k, v in normalized_string.iteritems())
+        missing_translations = None if language_codes is None else [l for l in language_codes if l not in normalized_string]
+        if missing_translations:
+            print "Error! The normalized string is missing the following translations: '{}'.".format("', '".join(missing_translations))
+            return False
+
+        return normalized_string and all(is_language_code(k) and not is_empty_string(v) for k, v in normalized_string.iteritems())
     except TypeError:
-        # The is_empty_string function will raise a TypeError if the code argument is not a
-        # string. So if the argument is not a string, it stands to reason that it's not a
-        # valid ISO code.
+        # Both the is_language_code and is_empty_string functions will raise a TypeError if
+        # their respective arguments are not strings. Therefore, if an argument is not a string,
+        # it is neither a valid ISO code or a (drum roll) string.
         return False
 
 
