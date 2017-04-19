@@ -52,14 +52,14 @@ def is_task_presenter_configuration(configuration, enable_logging=False):
     validators = {
         "language": is_task_presenter_language,
         "subject": is_task_presenter_subject,
-        "questionnaire": is_task_presenter_questionnaire,
+        "questionnaire": lambda q: is_task_presenter_questionnaire(q, configuration["language"]["available"]),
     }
-    for key, configuration in configuration.iteritems():
+    for key, value in configuration.iteritems():
         validator = validators.get(key)
         if not validator:
             return (False, "The task presenter configuration key '{}' is not recognized.".format(key))
 
-        valid, message = validator(configuration)
+        valid, message = validator(value)
         if not valid:
             return (False, message)
 
