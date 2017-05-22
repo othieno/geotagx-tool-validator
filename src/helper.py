@@ -99,7 +99,7 @@ def is_normalized_string(normalized_string, language_codes=None):
     try:
         missing_translations = None if language_codes is None else [l for l in language_codes if l not in normalized_string]
         if missing_translations:
-            print "Error! The normalized string is missing the following translations: '{}'.".format("', '".join(missing_translations))
+            print "The normalized string is missing the following translations: '{}'.".format("', '".join(missing_translations))
             return False
 
         return normalized_string and all(is_language_code(k) and not is_empty_string(v) for k, v in normalized_string.iteritems())
@@ -394,3 +394,19 @@ def deserialize_configuration_set(path): #pragma: no cover
                 question["help"] = minify(filedata, remove_comments=True, remove_empty_space=True)
 
     return configurations
+
+
+def print_exception(exception, verbose=True):
+    """Prints the specified exception information.
+    If the exception does not contain a message, the stack trace will be printed
+    by default.
+
+    Args:
+        exception (Exception): The exception information to print.
+        verbose (bool): If set to True, the entire stack trace will be printed.
+    """
+    if not str(exception) or verbose:
+        import traceback
+        traceback.print_exc()
+    else:
+        print "{0}: {1}".format(exception.__class__.__name__, exception)
