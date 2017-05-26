@@ -25,7 +25,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-from helper import check_arg_type, is_empty_string, is_configuration_string
+from helper import check_arg_type, is_configuration, is_empty_string, is_configuration_string
 
 def is_question(question, available_languages=None):
     """Validates the specified question configuration.
@@ -51,41 +51,20 @@ def is_question(question, available_languages=None):
         TypeError: If the question argument is not a dictionary or available_languages is
         not a list or NoneType.
     """
-    check_arg_type(is_question, "question", question, dict)
-    check_arg_type(is_question, "available_languages", available_languages, (list, type(None)))
-
-    missing = [k for k in is_question.REQUIRED_FIELDS if k not in question or question[k] is None]
-    if missing:
-        message = "The question configuration is missing the following fields: '{}'."
-        return (False, message.format("', '".join(missing)))
-
-    from functools import partial
-    validators = {
-        "key": is_question_key,
-        "title": partial(is_question_title, languages=available_languages),
-        "hint": partial(is_question_help, languages=available_languages),
-        "help": partial(is_question_help, languages=available_languages),
-        "input": partial(is_question_input, languages=available_languages),
-        "branch": is_question_branch,
-    }
-    for key, configuration in question.iteritems():
-        validator = validators.get(key)
-        if not validator:
-            return (False, "The question configuration key '{}' is not recognized.".format(key))
-
-        valid, message = validator(configuration)
-        if not valid:
-            return (False, message)
-
-    return (True, None)
-
-
-is_question.REQUIRED_FIELDS = frozenset([
-    "key",
-    "title",
-    "input"
-])
-"""A set of required question fields."""
+    return is_configuration(
+        question,
+        required_fields=frozenset(["key", "title", "input"]),
+        field_validators={
+            "key": is_question_key,
+            "title": lambda t: is_question_title(t, available_languages),
+            "hint": lambda h: is_question_help(h, available_languages),
+            "help": lambda h: is_question_help(h, available_languages),
+            "input": lambda i: is_question_input(i, available_languages),
+            "branch": is_question_branch,
+        },
+        missing_field_message="The question configuration is missing the following field(s): '{}'.",
+        unexpected_field_message="The question configuration key '{}' is not recognized."
+    )
 
 
 def __is_key(key):

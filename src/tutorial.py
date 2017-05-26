@@ -25,10 +25,10 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-from helper import check_arg_type, is_empty_string, is_configuration_string
+from helper import check_arg_type, is_configuration, is_empty_string, is_configuration_string
 
 def is_tutorial_configuration(
-    tutorial_configuration,
+    configuration,
     task_presenter_configuration,
     enable_logging=False,
     validate_task_presenter_configuration=True
@@ -36,9 +36,8 @@ def is_tutorial_configuration(
     """Validates the specified tutorial configuration.
 
     Args:
-        tutorial_configuration (dict): A tutorial configuration to validate.
+        configuration (dict): A tutorial configuration to validate.
         task_presenter_configuration (dict): The task presenter configuration complemented by the tutorial configuration.
-        enable_logging (bool): If set to True, the function will log the operations it performs.
         validate_task_presenter_configuration (bool): If set to True, the specified task presenter configuration is validated too.
 
     Returns:
@@ -49,9 +48,7 @@ def is_tutorial_configuration(
         TypeError: If either of the configuration arguments is not a dictionary, or the
             remaining arguments are not booleans.
     """
-    check_arg_type(is_tutorial_configuration, "tutorial_configuration", tutorial_configuration, dict)
     check_arg_type(is_tutorial_configuration, "task_presenter_configuration", task_presenter_configuration, dict)
-    check_arg_type(is_tutorial_configuration, "enable_logging", enable_logging, bool)
     check_arg_type(is_tutorial_configuration, "validate_task_presenter_configuration", validate_task_presenter_configuration, bool)
 
     if validate_task_presenter_configuration:
@@ -60,44 +57,30 @@ def is_tutorial_configuration(
         if not valid:
             return (False, message)
 
-    missing = [k for k in is_tutorial_configuration.REQUIRED_FIELDS if k not in tutorial_configuration]
-    if missing:
-        return (False, "The tutorial configuration is missing the following fields: '{}'.".format("', '".join(missing)))
+    def is_default_message(message):
+        return is_tutorial_default_message(message, task_presenter_configuration["language"]["available"])
 
-    available_languages = task_presenter_configuration["language"]["available"] if "language" in task_presenter_configuration else None
-
-    def is_subjects(subjects):
-        check_arg_type(is_subjects, "subjects", subjects, list)
+    def are_subjects(subjects):
+        check_arg_type(are_subjects, "subjects", subjects, list)
         if not subjects:
             return (False, "A project tutorial must contain at least one subject.")
         for subject in subjects:
-            valid, message = is_tutorial_subject(subject, available_languages)
+            valid, message = is_tutorial_subject(subject, task_presenter_configuration["language"]["available"])
             if not valid:
                 return (False, message)
         return (True, None)
 
-    from functools import partial
-    validators = {
-        "enable-random-order": is_tutorial_enable_random_order,
-        "default-message": partial(is_tutorial_default_message, languages=available_languages),
-        "subjects": is_subjects,
-    }
-    for key, configuration in tutorial_configuration.iteritems():
-        validator = validators.get(key)
-        if not validator:
-            return (False, "The tutorial configuration key '{}' is not recognized.".format(key))
-
-        valid, message = validator(configuration)
-        if not valid:
-            return (False, message)
-
-    return (True, None)
-
-
-is_tutorial_configuration.REQUIRED_FIELDS = frozenset([
-    "subjects",
-])
-"""A set of required tutorial configuration fields."""
+    return is_configuration(
+        configuration,
+        required_fields=frozenset(["subjects"]),
+        field_validators={
+            "enable-random-order": is_tutorial_enable_random_order,
+            "default-message": is_default_message,
+            "subjects": are_subjects,
+        },
+        missing_field_message="The tutorial configuration is missing the following field(s): '{}'.",
+        unexpected_field_message="The tutorial configuration key '{}' is not recognized."
+    )
 
 
 def is_tutorial_enable_random_order(enable_random_order):
@@ -165,13 +148,7 @@ def is_tutorial_subject(tutorial_subject, languages=None):
         TypeError: If the tutorial_subject argument is not a dictionary, or the languages
             argument is not a list or NoneType.
     """
-    check_arg_type(is_tutorial_subject, "tutorial_subject", tutorial_subject, dict)
     check_arg_type(is_tutorial_subject, "languages", languages, (list, type(None)))
-
-    missing = [k for k in is_tutorial_subject.REQUIRED_FIELDS if k not in tutorial_subject]
-    if missing:
-        message = "A tutorial's subject configuration is missing the following fields: '{}'."
-        return (False, message.format("', '".join(missing)))
 
     def is_source(subject_source):
         message = "A tutorial subject's 'source' field must be a non-empty string."
@@ -185,46 +162,30 @@ def is_tutorial_subject(tutorial_subject, languages=None):
         message = "A tutorial subject's 'attribution' field must be a non-empty string."
         return (False, message) if is_empty_string(subject_attribution) else (True, None)
 
-    def is_assertions(subject_assertions):
-        check_arg_type(is_assertions, "subject_assertions", subject_assertions, dict)
-
+    def are_subject_assertions(subject_assertions):
+        check_arg_type(are_subject_assertions, "subject_assertions", subject_assertions, dict)
         from question import is_question_key
         for key, assertion in subject_assertions.iteritems():
             valid, message = is_question_key(key)
             if not valid:
                 return (False, message)
-
             valid, message = is_tutorial_subject_assertion(assertion, languages)
             if not valid:
                 return (False, message)
-
         return (True, None)
 
-
-    validators = {
-        "source": is_source,
-        "page": is_page,
-        "attribution": is_attribution,
-        "assertions": is_assertions,
-    }
-    for key, field in tutorial_subject.iteritems():
-        validator = validators.get(key)
-        if not validator:
-            return (False, "The tutorial subject field '{}' is not recognized.".format(key))
-
-        valid, message = validator(field)
-        if not valid:
-            return (False, message)
-
-    return (True, None)
-
-
-is_tutorial_subject.REQUIRED_FIELDS = frozenset([
-    "source",
-    "page",
-    "assertions",
-])
-"""A collection of required tutorial subject fields."""
+    return is_configuration(
+        tutorial_subject,
+        required_fields=frozenset(["source", "page", "assertions"]),
+        field_validators={
+            "source": is_source,
+            "page": is_page,
+            "attribution": is_attribution,
+            "assertions": are_subject_assertions,
+        },
+        missing_field_message="The tutorial's subject configuration is missing the following field(s): '{}'.",
+        unexpected_field_message="The tutorial's subject configuration key '{}' is not recognized."
+    )
 
 
 def is_tutorial_subject_assertion(tutorial_subject_assertion, languages=None):
@@ -242,13 +203,7 @@ def is_tutorial_subject_assertion(tutorial_subject_assertion, languages=None):
         TypeError: If the tutorial_subject_assertion argument is not a dictionary, or
             the languages argument is not a list or NoneType.
     """
-    check_arg_type(is_tutorial_subject_assertion, "tutorial_subject_assertion", tutorial_subject_assertion, dict)
     check_arg_type(is_tutorial_subject_assertion, "languages", languages, (list, type(None)))
-
-    missing = [k for k in is_tutorial_subject_assertion.REQUIRED_FIELDS if k not in tutorial_subject_assertion]
-    if missing:
-        message = "A tutorial subject assertion is missing the following fields: '{}'."
-        return (False, message.format("', '".join(missing)))
 
     def is_expects(assertion_expects):
         message = "A tutorial subject assertion's 'expects' field must be a non-empty string."
@@ -264,24 +219,14 @@ def is_tutorial_subject_assertion(tutorial_subject_assertion, languages=None):
         message = "A tutorial subject assertion's 'autocomplete' field must contain a boolean value."
         return (True, None) if isinstance(assertion_autocomplete, bool) else (False, message)
 
-    validators = {
-        "expects": is_expects,
-        "messages": is_messages,
-        "autocomplete": is_autocomplete,
-    }
-    for key, field in tutorial_subject_assertion.iteritems():
-        validator = validators.get(key)
-        if not validator:
-            return (False, "The tutorial subject assertion field '{}' is not recognized.".format(key))
-        else:
-            valid, message = validator(field)
-            if not valid:
-                return (False, message)
-
-    return (True, None)
-
-
-is_tutorial_subject_assertion.REQUIRED_FIELDS = frozenset([
-    "expects",
-])
-"""A collection of required tutorial subject assertion fields."""
+    return is_configuration(
+        tutorial_subject_assertion,
+        required_fields=frozenset(["expects"]),
+        field_validators={
+            "expects": is_expects,
+            "messages": is_messages,
+            "autocomplete": is_autocomplete,
+        },
+        missing_field_message="A tutorial subject assertion configuration is missing the following field(s): '{}'.",
+        unexpected_field_message="The tutorial subject assertion configuration key '{}' is not recognized."
+    )

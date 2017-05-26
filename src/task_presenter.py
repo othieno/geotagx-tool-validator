@@ -25,51 +25,33 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-from helper import check_arg_type, is_language_code, is_empty_string
+from helper import check_arg_type, is_configuration, is_language_code, is_empty_string
 
 def is_task_presenter_configuration(configuration, enable_logging=False):
     """Validates the specified task presenter configuration.
 
     Args:
         configuration (dict): A task presenter configuration to validate.
-        enable_logging (bool): If set to True, the function will log the operations it performs.
 
     Returns:
         <bool, str|None>: A pair containing the value True if the specified configuration
             is valid, False otherwise; and an error message in case the name is invalid.
 
     Raises:
-        TypeError: If the configuration argument is not a dictionary or enable_logging is not a boolean.
+        TypeError: If the configuration argument is not a dictionary.
     """
-    check_arg_type(is_task_presenter_configuration, "configuration", configuration, dict)
-    check_arg_type(is_task_presenter_configuration, "enable_logging", enable_logging, bool)
-
-    missing = [k for k in is_task_presenter_configuration.REQUIRED_FIELDS if k not in configuration]
-    if missing:
-        message = "The task presenter configuration is missing the following fields: '{}'."
-        return (False, message.format("', '".join(missing)))
-
-    validators = {
-        "language": is_task_presenter_language,
-        "subject": is_task_presenter_subject,
-        "questionnaire": lambda q: is_task_presenter_questionnaire(q, configuration["language"]["available"]),
-    }
-    for key, value in configuration.iteritems():
-        validator = validators.get(key)
-        if not validator:
-            return (False, "The task presenter configuration key '{}' is not recognized.".format(key))
-
-        valid, message = validator(value)
-        if not valid:
-            return (False, message)
-
-    return (True, None)
-
-
-is_task_presenter_configuration.REQUIRED_FIELDS = frozenset([
-    "questionnaire"
-])
-"""A set of required task presenter configuration fields."""
+    from collections import  OrderedDict
+    return is_configuration(
+        configuration,
+        required_fields=frozenset(["questionnaire"]),
+        field_validators=OrderedDict({
+            "language": is_task_presenter_language, # This field should be validated before it is used below so an OrderedDict is used.
+            "subject": is_task_presenter_subject,
+            "questionnaire": lambda q: is_task_presenter_questionnaire(q, configuration["language"]["available"]),
+        }),
+        missing_field_message="The task presenter configuration is missing the following field(s): '{}'.",
+        unexpected_field_message="The task presenter configuration key '{}' is not recognized."
+    )
 
 
 def is_task_presenter_language(language):
@@ -90,35 +72,34 @@ def is_task_presenter_language(language):
     Raises:
         TypeError: If the 'language' argument is not a dictionary.
     """
-    check_arg_type(is_task_presenter_language, "language", language, dict)
+    def is_default_language(default_language):
+        if default_language not in language["available"]:
+            message = "The task presenter's default language '{}' is not listed as an available language."
+            return (False, message.format(default_language))
 
-    missing = [k for k in is_task_presenter_language.REQUIRED_FIELDS if k not in language]
-    if missing:
-        message = "The task presenter's language configuration is missing the following fields: '{}'."
-        return (False, message.format("', '".join(missing)))
+        return (True, None)
 
-    available_languages = language["available"]
-    if not isinstance(available_languages, list) or len(available_languages) < 1:
-        return (False, "The list of available languages must be a non-empty list of language codes.")
+    def are_available_languages(available_languages):
+        if not isinstance(available_languages, list) or len(available_languages) < 1:
+            return (False, "The list of available languages must be a non-empty list of language codes.")
 
-    invalid_language_codes = [l for l in available_languages if not is_language_code(l)]
-    if invalid_language_codes:
-        message = "The task presenter's list of available languages contains the following invalid codes: '{}'."
-        return (False, message.format("', '".join(invalid_language_codes)))
+        invalid_language_codes = [l for l in available_languages if not is_language_code(l)]
+        if invalid_language_codes:
+            message = "The task presenter's list of available languages contains the following invalid codes: '{}'."
+            return (False, message.format("', '".join(invalid_language_codes)))
 
-    default_language = language["default"]
-    if default_language not in available_languages:
-        message = "The task presenter's default language '{}' is not listed as an available language."
-        return (False, message.format(default_language))
+        return (True, None)
 
-    return (True, None)
-
-
-is_task_presenter_language.REQUIRED_FIELDS = frozenset([
-    "default",
-    "available",
-])
-"""A set of required language configuration fields."""
+    return is_configuration(
+        language,
+        required_fields=frozenset(["default", "available"]),
+        field_validators={
+            "default": is_default_language,
+            "available": are_available_languages,
+        },
+        missing_field_message="The task presenter's language configuration is missing the following field(s): '{}'.",
+        unexpected_field_message="The task presenter's language configuration key '{}' is not recognized."
+    )
 
 
 def is_task_presenter_subject(subject):
@@ -137,32 +118,15 @@ def is_task_presenter_subject(subject):
     Raises:
         TypeError: If the 'subject' argument is not a dictionary.
     """
-    check_arg_type(is_task_presenter_subject, "subject", subject, dict)
-
-    missing = [k for k in is_task_presenter_subject.REQUIRED_FIELDS if k not in subject]
-    if missing:
-        message = "The task presenter's subject configuration is missing the following fields: '{}'."
-        return (False, message.format("', '".join(missing)))
-
-    validators = {
-        "type": is_subject_type,
-    }
-    for key, configuration in subject.iteritems():
-        validator = validators.get(key)
-        if not validator:
-            return (False, "The task presenter subject configuration key '{}' is not recognized.".format(key))
-
-        valid, message = validator(configuration)
-        if not valid:
-            return (False, message)
-
-    return (True, None)
-
-
-is_task_presenter_subject.REQUIRED_FIELDS = frozenset([
-    "type",
-])
-"""A set of required subject configuration fields."""
+    return is_configuration(
+        subject,
+        required_fields=frozenset(["type"]),
+        field_validators={
+            "type": is_subject_type,
+        },
+        missing_field_message="The task presenter's subject configuration is missing the following field(s): '{}'.",
+        unexpected_field_message="The task presenter's subject configuration key '{}' is not recognized."
+    )
 
 
 def is_task_presenter_questionnaire(questionnaire, languages=None):
@@ -183,25 +147,29 @@ def is_task_presenter_questionnaire(questionnaire, languages=None):
         TypeError: If the questionnaire argument is not a dictionary or languages
         is not a list or NoneType.
     """
-    check_arg_type(is_task_presenter_questionnaire, "questionnaire", questionnaire, dict)
     check_arg_type(is_task_presenter_questionnaire, "languages", languages, (list, type(None)))
 
-    missing = [k for k in ["questions"] if k not in questionnaire]
-    if missing:
-        message = "The task presenter's questionnaire configuration is missing the following fields: '{}'."
-        return (False, message.format("', '".join(missing)))
+    def are_questions(questions):
+        check_arg_type(are_questions, "questions", questions, list)
+        if not questions:
+            return (False, "A questionnaire must be a non-empty list of questions.")
+        else:
+            from question import is_question
+            for q in questions:
+                valid, message = is_question(q, languages)
+                if not valid:
+                    return (False, message)
+            return (True, None)
 
-    questions = questionnaire["questions"]
-    if not isinstance(questions, list) or len(questions) < 1:
-        return (False, "A questionnaire must have a non-empty list of questions.")
-    else:
-        from question import is_question
-        for q in questions:
-            valid, message = is_question(q, languages)
-            if not valid:
-                return (False, message)
-
-    return (True, None)
+    return is_configuration(
+        questionnaire,
+        required_fields=frozenset(["questions"]),
+        field_validators={
+            "questions": are_questions,
+        },
+        missing_field_message="The task presenter's questionnaire configuration is missing the following field(s): '{}'.",
+        unexpected_field_message="The task presenter's questionnaire configuration key '{}' is not recognized."
+    )
 
 
 def is_subject_type(subject_type):

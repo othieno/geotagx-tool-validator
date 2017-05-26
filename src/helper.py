@@ -55,6 +55,42 @@ def check_arg_type(f, arg_name, arg_value, expected_type): # pragma: no cover
             raise TypeError(message.format(f.func_name, types, arg_name, arg_type))
 
 
+def is_configuration(
+    configuration,
+    required_fields=None,
+    field_validators=None,
+    missing_field_message=None,
+    unexpected_field_message=None
+):
+    """TODO Document me.
+    """
+    check_arg_type(is_configuration, "configuration", configuration, dict)
+    check_arg_type(is_configuration, "required_fields", required_fields, (frozenset, type(None)))
+    check_arg_type(is_configuration, "field_validators", field_validators, (dict, type(None)))
+    check_arg_type(is_configuration, "missing_field_message", missing_field_message, (basestring, type(None)))
+    check_arg_type(is_configuration, "unexpected_field_message", unexpected_field_message, (basestring, type(None)))
+
+    if required_fields:
+        missing_fields = [k for k in required_fields if k not in configuration or configuration[k] is None]
+        if missing_fields:
+            if not missing_field_message:
+                missing_field_message = "The configuration is missing the following field(s): '{}'."
+            return (False, missing_field_message.format("', '".join(missing_fields)))
+
+    if field_validators:
+        for key, value in configuration.iteritems():
+            validator = field_validators.get(key)
+            if not validator:
+                if not unexpected_field_message:
+                    unexpected_field_message = "The configuration key '{}' is not recognized."
+                return (False, unexpected_field_message.format(key))
+            valid, message = validator(value)
+            if not valid:
+                return (False, message)
+
+    return (True, None)
+
+
 def is_empty_string(empty_string):
     """Checks if the specified string is empty.
 

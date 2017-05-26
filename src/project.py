@@ -25,54 +25,34 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-from helper import check_arg_type, is_empty_string, is_url
+from helper import check_arg_type, is_configuration, is_empty_string, is_url
 
 def is_project_configuration(configuration, enable_logging=False):
     """Validates the specified project configuration.
 
     Args:
         configuration (dict): A project configuration to validate.
-        enable_logging (bool): If set to True, the function will log the operations it performs.
 
     Returns:
         <bool, str|None>: A pair containing the value True if the specified configuration
             is valid, False otherwise; and an error message in case the name is invalid.
 
     Raises:
-        TypeError: If the configuration argument is not a dictionary or enable_logging is not a boolean.
+        TypeError: If the configuration argument is not a dictionary.
     """
-    check_arg_type(is_project_configuration, "configuration", configuration, dict)
-    check_arg_type(is_project_configuration, "enable_logging", enable_logging, bool)
-
-    missing = [k for k in is_project_configuration.REQUIRED_FIELDS if k not in configuration]
-    if missing:
-        return (False, "The project configuration is missing the following fields: '{}'.".format("', '".join(missing)))
-
-    validators = {
-        "name": is_project_name,
-        "short_name": is_project_short_name,
-        "description": is_project_description,
-        "repository": is_project_repository,
-        "do_not_track": is_project_do_not_track,
-    }
-    for key, configuration in configuration.iteritems():
-        validator = validators.get(key)
-        if not validator:
-            return (False, "The project configuration key '{}' is not recognized.".format(key))
-
-        valid, message = validator(configuration)
-        if not valid:
-            return (False, message)
-
-    return (True, None)
-
-
-is_project_configuration.REQUIRED_FIELDS = frozenset([
-    "name",
-    "short_name",
-    "description",
-])
-"""A set of required project configuration fields."""
+    return is_configuration(
+        configuration,
+        required_fields=frozenset(["name", "short_name", "description"]),
+        field_validators={
+            "name": is_project_name,
+            "short_name": is_project_short_name,
+            "description": is_project_description,
+            "repository": is_project_repository,
+            "do_not_track": is_project_do_not_track,
+        },
+        missing_field_message="The project configuration is missing the following field(s): '{}'.",
+        unexpected_field_message="The project configuration key '{}' is not recognized."
+    )
 
 
 def is_project_name(name):
