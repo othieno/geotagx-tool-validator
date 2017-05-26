@@ -510,7 +510,7 @@ is_question_input.REQUIRED_FIELDS = frozenset([
 
 
 is_question_input.EXPECTED_FIELDS = {
-    "polar": frozenset(["type"]),
+    "polar": frozenset(),
     "dropdown-list": frozenset([
         "options",
         "prompt",
