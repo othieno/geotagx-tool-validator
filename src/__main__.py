@@ -50,7 +50,7 @@ def run(arguments):
 
         for path in sanitize_paths(arguments.paths):
             configuration_set = deserialize_configuration_set(path)
-            valid, message = is_configuration_set(configuration_set, arguments.verbose)
+            valid, message = is_configuration_set(configuration_set)
             if not valid:
                 print message
                 exit_code = 1

@@ -30,7 +30,6 @@ from helper import check_arg_type, is_configuration, is_empty_string, is_configu
 def is_tutorial_configuration(
     configuration,
     task_presenter_configuration,
-    enable_logging=False,
     validate_task_presenter_configuration=True
 ):
     """Validates the specified tutorial configuration.
@@ -46,7 +45,7 @@ def is_tutorial_configuration(
 
     Raises:
         TypeError: If either of the configuration arguments is not a dictionary, or the
-            remaining arguments are not booleans.
+            validate_task_presenter_configuration argument is not a boolean.
     """
     check_arg_type(is_tutorial_configuration, "task_presenter_configuration", task_presenter_configuration, dict)
     check_arg_type(is_tutorial_configuration, "validate_task_presenter_configuration", validate_task_presenter_configuration, bool)

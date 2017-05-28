@@ -27,7 +27,7 @@
 # OR OTHER DEALINGS IN THE SOFTWARE.
 from helper import check_arg_type, is_configuration, is_language_code, is_empty_string
 
-def is_task_presenter_configuration(configuration, enable_logging=False):
+def is_task_presenter_configuration(configuration):
     """Validates the specified task presenter configuration.
 
     Args:

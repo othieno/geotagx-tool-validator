@@ -29,7 +29,7 @@ from task_presenter import is_task_presenter_configuration
 from tutorial import is_tutorial_configuration
 from helper import check_arg_type
 
-def is_configuration_set(configurations, enable_logging=False):
+def is_configuration_set(configurations):
     """Validates the specified set of configurations.
 
     A configuration set must contain the project (project.json) and task presenter
@@ -41,33 +41,30 @@ def is_configuration_set(configurations, enable_logging=False):
 
     Args:
         configurations (dict): A dictionary containing a set of configurations to validate.
-        enable_logging (bool): If set to True, the function will log the operations it performs.
 
     Returns:
         <bool, str|None>: A pair containing the value True if the specified configuration
             set is valid, False otherwise; and an error message in case the set is invalid.
 
     Raises:
-        TypeError: If the configurations argument is not a dictionary or enable_logging is not a boolean.
+        TypeError: If the configurations argument is not a dictionary.
         ValueError: If a required configuration is missing from the configuration set.
     """
     check_arg_type(is_configuration_set, "configurations", configurations, dict)
-    check_arg_type(is_configuration_set, "enable_logging", enable_logging, bool)
 
     is_nonempty_dictionary = lambda d: isinstance(d, dict) and len(d) > 0
     if not all(is_nonempty_dictionary(configurations.get(k)) for k in ["project", "task_presenter"]):
         raise ValueError("A required configuration is missing from the specified configuration set.")
 
-    from functools import partial
-    validators = {
+    from collections import OrderedDict
+    validators = OrderedDict({
         "project": is_project_configuration,
         "task_presenter": is_task_presenter_configuration,
-        "tutorial": partial(is_tutorial_configuration, task_presenter_configuration=configurations["task_presenter"], validate_task_presenter_configuration=False),
-    }
-
+        "tutorial": lambda t: is_tutorial_configuration(t, configurations["task_presenter"], False),
+    })
     for key, configuration in configurations.iteritems():
         validator = validators[key]
-        valid, message = validator(configuration, enable_logging=enable_logging)
+        valid, message = validator(configuration)
         if not valid:
             return (False, message)
 

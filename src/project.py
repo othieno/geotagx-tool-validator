@@ -27,7 +27,7 @@
 # OR OTHER DEALINGS IN THE SOFTWARE.
 from helper import check_arg_type, is_configuration, is_empty_string, is_url
 
-def is_project_configuration(configuration, enable_logging=False):
+def is_project_configuration(configuration):
     """Validates the specified project configuration.
 
     Args:

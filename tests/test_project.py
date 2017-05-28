@@ -41,11 +41,6 @@ class TestProjectValidator(unittest.TestCase):
         self.assertRaises(TypeError, validator.is_project_configuration, 42)
         self.assertRaises(TypeError, validator.is_project_configuration, "")
         self.assertRaises(TypeError, validator.is_project_configuration, [])
-        self.assertRaises(TypeError, validator.is_project_configuration, {}, None)
-        self.assertRaises(TypeError, validator.is_project_configuration, {}, 42)
-        self.assertRaises(TypeError, validator.is_project_configuration, {}, "")
-        self.assertRaises(TypeError, validator.is_project_configuration, {}, [])
-        self.assertRaises(TypeError, validator.is_project_configuration, {}, {})
         self.assertFalse(validator.is_project_configuration({})[0], "Empty dictionary")
         self.assertFalse(validator.is_project_configuration({"name": "Demo"})[0], "Missing keys")
         self.assertFalse(validator.is_project_configuration({
