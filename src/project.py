@@ -48,7 +48,7 @@ def is_project_configuration(configuration):
             "short_name": is_project_short_name,
             "description": is_project_description,
             "repository": is_project_repository,
-            "do_not_track": is_project_do_not_track,
+            "track": is_project_track,
         },
         missing_field_message="The project configuration is missing the following field(s): '{}'.",
         unexpected_field_message="The project configuration key '{}' is not recognized."
@@ -136,17 +136,17 @@ def is_project_repository(url):
         return (False, "The 'url' argument must be a string.")
 
 
-def is_project_do_not_track(do_not_track):
-    """Validates the specified project 'Do Not Track' flag.
+def is_project_track(track):
+    """Validates the specified project analytics tracking flag.
 
     A flag is nothing but a boolean value.
 
     Args:
-        do_not_track (bool): A flag to validate.
+        track (bool): A flag to validate.
 
     Returns:
         <bool, str|None>: A pair containing the value True if the specified flag
             is valid, False otherwise; and an error message in case the flag is invalid.
     """
-    ERROR_MESSAGE = "The 'do_not_track' argument must be a boolean."
-    return (True, None) if isinstance(do_not_track, bool) else (False, ERROR_MESSAGE)
+    ERROR_MESSAGE = "The 'track' argument must be a boolean."
+    return (True, None) if isinstance(track, bool) else (False, ERROR_MESSAGE)

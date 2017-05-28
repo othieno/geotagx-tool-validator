@@ -116,15 +116,15 @@ class TestProjectValidator(unittest.TestCase):
         self.assertFalse(validator.is_project_repository("github.com/geotagx/geotagx-project-demo.git")[0], "Missing URL protocol")
 
     def test_valid_project_tracking(self):
-        self.assertTrue(validator.is_project_do_not_track(True)[0], "Tracking disabled")
-        self.assertTrue(validator.is_project_do_not_track(False)[0], "Tracking enabled")
+        self.assertTrue(validator.is_project_track(True)[0], "Tracking disabled")
+        self.assertTrue(validator.is_project_track(False)[0], "Tracking enabled")
 
     def test_illegal_project_tracking(self):
-        self.assertFalse(validator.is_project_do_not_track(None)[0], "No value")
-        self.assertFalse(validator.is_project_do_not_track(42)[0], "Tracking boolean is a numerical value")
-        self.assertFalse(validator.is_project_do_not_track("")[0], "Tracking boolean is a string")
-        self.assertFalse(validator.is_project_do_not_track([])[0], "Tracking boolean is a list")
-        self.assertFalse(validator.is_project_do_not_track({})[0], "Tracking boolean is a dictionary")
+        self.assertFalse(validator.is_project_track(None)[0], "No value")
+        self.assertFalse(validator.is_project_track(42)[0], "Argument is a numerical value")
+        self.assertFalse(validator.is_project_track("")[0], "Argument is a string")
+        self.assertFalse(validator.is_project_track([])[0], "Argument is a list")
+        self.assertFalse(validator.is_project_track({})[0], "Argument is a dictionary")
 
 
 if __name__ == "__main__":
